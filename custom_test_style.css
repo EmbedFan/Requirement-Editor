@@ -1,0 +1,169 @@
+/* Custom Test Stylesheet for Requirement Documents */
+body {
+    font-family: 'Times New Roman', serif;
+    line-height: 1.8;
+    margin: 30px;
+    background-color: #fafafa;
+    color: #333;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.title {
+    color: #8b0000;
+    border-bottom: 2px solid #8b0000;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+}
+
+.requirement {
+    background-color: #f0f8ff;
+    border-left: 5px solid #4169e1;
+    padding: 15px 20px;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+
+.comment {
+    background-color: #fff8dc;
+    border-left: 5px solid #ffa500;
+    padding: 15px 20px;
+    margin: 5px 0;
+    border-radius: 5px;
+    font-style: italic;
+}
+
+.subtitle {
+    color: #4b0082;
+    font-weight: bold;
+    margin: 12px 0 4px 0;
+    padding: 12px 15px;
+    background-color: #f5f5dc;
+    border-left: 5px solid #4b0082;
+    font-size: 1.3em;
+}
+
+.unknown {
+    background-color: #f5f5f5;
+    border-left: 5px solid #808080;
+    padding: 15px 20px;
+    margin: 12px 0;
+    border-radius: 5px;
+}
+
+/* Control buttons styling */
+.controls {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.controls button {
+    margin: 0 15px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.controls .expand-btn {
+    background: #4169e1;
+    color: white;
+}
+
+.controls .collapse-btn {
+    background: #dc143c;
+    color: white;
+}
+
+.controls .toggle-btn {
+    background: #8b008b;
+    color: white;
+}
+
+.controls .print-btn {
+    background: #228b22;
+    color: white;
+}
+
+/* Indentation classes */
+.indent-0 { margin-left: 0px; }
+.indent-1 { margin-left: 40px; }
+.indent-2 { margin-left: 80px; }
+.indent-3 { margin-left: 120px; }
+.indent-4 { margin-left: 160px; }
+.indent-5 { margin-left: 200px; }
+.indent-6 { margin-left: 240px; }
+.indent-7 { margin-left: 280px; }
+.indent-8 { margin-left: 320px; }
+.indent-9 { margin-left: 360px; }
+.indent-10 { margin-left: 400px; }
+
+/* Line number styling */
+.line-number {
+    color: #8b0000;
+    font-size: 0.9em;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+.line-number.hidden {
+    display: none;
+}
+
+/* Collapsible element styling */
+.collapsible {
+    position: relative;
+    cursor: pointer;
+}
+
+.collapsible::before {
+    content: "▼";
+    position: absolute;
+    left: -25px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9em;
+    color: #4169e1;
+    transition: transform 0.3s ease;
+}
+
+.collapsible.collapsed::before {
+    transform: translateY(-50%) rotate(-90deg);
+}
+
+.collapsible-content {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.collapsible-content.collapsed {
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.collapsible-content.expanded {
+    max-height: 1000px;
+}
+
+/* Print media queries */
+@media print {
+    .controls {
+        display: none !important;
+    }
+    
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}

@@ -17,13 +17,24 @@ python/
 ├── main.py                    # Main entry point and workflow orchestrator
 ├── libs/                      # Core functionality modules
 │   ├── parse_req_md.py       # Markdown parsing and classification engine
-│   └── gen_html_doc.py       # HTML generation and styling module
+│   ├── gen_html_doc.py       # HTML generation and styling module
+│   └── project.py            # Project configuration management module
 ├── docs/                      # Comprehensive documentation
 │   ├── README.md             # Project overview (duplicate of this file)
 │   ├── main.md               # main.py detailed documentation
 │   ├── parse_req_md.md       # Parsing module detailed documentation
-│   └── gen_html_doc.md       # HTML generation module detailed documentation
-└── test_input.md             # Sample requirement document for testing
+│   ├── gen_html_doc.md       # HTML generation module detailed documentation
+│   └── project.md            # Project configuration module detailed documentation
+├── test/                      # Test suite (renamed from tests/)
+│   ├── README.md             # Test suite documentation
+│   ├── test_runner.py        # Test runner for all test modules
+│   ├── test_comprehensive.py # Comprehensive integration tests
+│   ├── test_project_config.py # Project configuration tests
+│   ├── test_simple.py        # Simple unit tests
+│   └── data/                 # Test data files
+│       ├── test_input.md     # Sample requirement document for testing
+│       └── test_input.html   # Expected HTML output for testing
+└── LICENSE                    # MIT License
 ```
 
 ## Quick Start
@@ -65,7 +76,8 @@ test_input.md → ReadMDFile() → ClassifyParts() → _build_hierarchy() → Ge
 |--------|-------------|---------------|--------------|
 | **main.py** | Workflow orchestration, user interface, file I/O | `main()`, `SaveHTMLFile()` | libs.parse_req_md, libs.gen_html_doc |
 | **libs/parse_req_md.py** | Markdown parsing, content classification, hierarchy building | `ReadMDFile()`, `ClassifyParts()`, `_build_hierarchy()` | re (built-in) |
-| **libs/gen_html_doc.py** | HTML generation, CSS styling, JavaScript interactivity | `GenerateHTML()` | Self-contained |
+| **libs/gen_html_doc.py** | HTML generation, CSS styling, JavaScript interactivity | `GenerateHTML()`, `_get_default_style_template()` | Self-contained |
+| **libs/project.py** | Project configuration management, stylesheet configuration | `ProjectConfig()`, `create_project_config()`, `load_project_config()` | json, os, datetime (built-in) |
 
 ## Features
 
@@ -80,6 +92,7 @@ test_input.md → ReadMDFile() → ClassifyParts() → _build_hierarchy() → Ge
 ### HTML Generation Engine (libs/gen_html_doc.py)
 - **Interactive Elements**: Dynamic expand/collapse functionality for hierarchical navigation
 - **Professional Styling**: Modern CSS with color-coded element types and responsive design
+- **Configurable Stylesheets**: Support for custom CSS templates via project configuration
 - **Control Interface**: Comprehensive button suite (expand all, collapse all, line numbers, print)
 - **Print Optimization**: Clean PDF output with preserved colors and hidden UI controls
 - **Security**: XSS prevention through proper HTML escaping
@@ -355,6 +368,45 @@ document_name = filename.replace('.md', '').replace('_', ' ').title()
 html_content = GenerateHTML(classified_parts, f"{document_name} - Requirements")
 ```
 
+### Custom Stylesheet Configuration
+
+The HTML generator now supports configurable stylesheets through the project configuration system:
+
+```python
+from libs.project import ProjectConfig
+
+# Create or load project configuration
+config = ProjectConfig('my_project_config.json')
+config.create_new_project('requirements.md')
+
+# Set custom stylesheet template path
+config.set_style_template_path('custom_styles.css')
+config.save_project()
+
+# Use configuration when generating HTML
+html_content = GenerateHTML(classified_parts, "My Document", config)
+```
+
+#### Creating Custom Stylesheets
+Custom stylesheets must include all necessary CSS classes. You can start with the default template and modify it:
+
+```python
+# Get the default template as a starting point
+from libs.gen_html_doc import _get_default_style_template
+default_css = _get_default_style_template()
+
+# Save to file for customization
+with open('my_custom_style.css', 'w') as f:
+    f.write(default_css)
+```
+
+Key CSS classes that must be included:
+- `.title`, `.subtitle`, `.requirement`, `.comment`, `.unknown` - Element types
+- `.indent-0` through `.indent-10` - Indentation levels
+- `.line-number`, `.collapsible`, `.collapsible-content` - Interactive features
+- `.controls` and button classes - Control interface
+- `@media print` - Print optimization
+
 ## Generated HTML Features
 
 ### Interactive Elements
@@ -607,6 +659,7 @@ This output helps identify parsing issues and verify document structure.
 - **🔧 [main.py Documentation](docs/main.md)**: Workflow orchestrator details
 - **🔍 [parse_req_md.py Documentation](docs/parse_req_md.md)**: Parsing engine internals
 - **🎨 [gen_html_doc.py Documentation](docs/gen_html_doc.md)**: HTML generation details
+- **📁 [project.py Documentation](docs/project.md)**: Project configuration management details
 
 ### Contributing Guidelines
 

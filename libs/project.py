@@ -19,13 +19,15 @@ Configuration Data Structure:
 - project_creation_date: When the project was first created (YYYY-MM-DD HH:MM)
 - project_last_modification_date: When the project was last modified (YYYY-MM-DD HH:MM)
 - application_version: Version of the Requirement Editor used
+- style_template_path: Optional path to custom CSS stylesheet template file
 
 JSON Schema:
 {
     "input_md_file_path": "path/to/requirements.md",
     "project_creation_date": "2025-07-09 14:40",
     "project_last_modification_date": "2025-07-09 15:20",
-    "application_version": "1.0.0"
+    "application_version": "1.0.0",
+    "style_template_path": "path/to/custom_stylesheet.css"
 }
 
 Working Directory Policy:
@@ -69,6 +71,7 @@ class ProjectConfig:
         - project_creation_date: Project creation timestamp (YYYY-MM-DD HH:MM)
         - project_last_modification_date: Last modification timestamp (YYYY-MM-DD HH:MM)
         - application_version: Requirement Editor version string
+        - style_template_path: Optional path to custom CSS stylesheet template file
     """
     
     def __init__(self, config_file_path: str):
@@ -114,7 +117,8 @@ class ProjectConfig:
                 "input_md_file_path": input_md_file_path,
                 "project_creation_date": current_time,
                 "project_last_modification_date": current_time,
-                "application_version": APPLICATION_VERSION
+                "application_version": APPLICATION_VERSION,
+                "style_template_path": None
             }
             
             return self.save_project()
@@ -164,6 +168,10 @@ class ProjectConfig:
                 if field not in self.config_data:
                     print(f"Missing required field in project configuration: {field}")
                     return False
+            
+            # Set default value for optional fields if not present
+            if "style_template_path" not in self.config_data:
+                self.config_data["style_template_path"] = None
             
             # Update modification date and save
             self.update_modification_date()
@@ -289,6 +297,32 @@ class ProjectConfig:
         """
         return self.config_data.get("application_version")
     
+    def get_style_template_path(self) -> Optional[str]:
+        """
+        Get the stylesheet template path from project configuration.
+        
+        Returns:
+            str: Path to custom stylesheet template file if available.
+            None: If configuration not loaded, field not present, or set to None.
+        """
+        return self.config_data.get("style_template_path")
+    
+    def set_style_template_path(self, template_path: Optional[str]) -> None:
+        """
+        Update the stylesheet template path in project configuration.
+        
+        Args:
+            template_path (str, optional): Path to custom stylesheet template file.
+                                         Set to None to use default hardcoded template.
+            
+        Side Effects:
+            - Updates config_data['style_template_path']
+            - Updates modification date to current time
+            - Does not automatically save - call save_project() to persist changes
+        """
+        self.config_data["style_template_path"] = template_path
+        self.update_modification_date()
+    
     def get_all_config(self) -> Dict[str, Any]:
         """
         Get complete project configuration as dictionary.
@@ -330,6 +364,7 @@ class ProjectConfig:
         print(f"Created:           {self.config_data.get('project_creation_date', 'N/A')}")
         print(f"Last Modified:     {self.config_data.get('project_last_modification_date', 'N/A')}")
         print(f"App Version:       {self.config_data.get('application_version', 'N/A')}")
+        print(f"Style Template:    {self.config_data.get('style_template_path', 'Default (hardcoded)')}")
         print(f"Config File:       {self.config_file_path}")
         print("=" * 60)
 

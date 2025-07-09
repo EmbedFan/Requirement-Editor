@@ -7,7 +7,12 @@ This directory contains all test files and test data for the Requirement Editor 
 ```
 test/
 ├── test_runner.py              # Automated test discovery and execution
+├── test_comprehensive.py       # Comprehensive integration tests
 ├── test_project_config.py      # Tests for project configuration module
+├── test_simple.py              # Simple unit tests for basic functionality
+├── test_stylesheet_config.py   # Tests for stylesheet configuration system
+├── test_reporter.py            # HTML test report generator
+├── results/                    # Test execution results and reports
 └── data/
     ├── test_input.md           # Sample markdown requirement document
     └── test_input.html         # Generated HTML output (created by tests)
@@ -38,8 +43,11 @@ When all tests pass, you should see:
 ```
 Requirement Editor Test Runner
 ============================================================
-Found 1 test file(s):
-  - test_project_config.py
+Found 4 test file(s):
+  - test_comprehensive.py
+  - test_project_config.py  
+  - test_simple.py
+  - test_stylesheet_config.py
 
 ============================================================
 Running: test_project_config.py
@@ -102,6 +110,32 @@ Generated HTML output from processing `test_input.md`. This file is created duri
 - **Main Application Workflow**: End-to-end test of markdown parsing and HTML generation
 - **File I/O**: Tests reading input files and writing output files
 - **Module Integration**: Validates interaction between parsing, generation, and configuration modules
+
+## Test Modules
+
+### test_stylesheet_config.py
+Comprehensive test suite for the stylesheet configuration system:
+- **Hardcoded Default Stylesheet**: Validates `_get_default_style_template()` function
+- **Project Configuration**: Tests `ProjectConfig` stylesheet path management
+- **HTML Generation**: Verifies HTML generation with custom and default stylesheets  
+- **Graceful Fallback**: Tests fallback behavior when custom stylesheets are unavailable
+- **Integration Testing**: End-to-end validation of stylesheet configuration workflow
+
+This test module includes:
+- CSS template validation (structure, required classes, syntax)
+- Project configuration persistence and loading
+- Custom stylesheet loading and error handling
+- HTML output validation with different stylesheet configurations
+- Backward compatibility testing for older project configurations
+
+### test_comprehensive.py
+Integration tests covering the complete application workflow from markdown parsing to HTML generation.
+
+### test_simple.py
+Basic unit tests for core functionality including parsing and classification.
+
+### test_project_config.py
+Tests for the project configuration management system including security features and file operations.
 
 ## Adding New Tests
 

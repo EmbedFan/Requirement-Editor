@@ -1,0 +1,229 @@
+/* 
+HTML Document Stylesheet Template for Requirement Documents
+
+This stylesheet provides professional styling for requirement documents
+generated from markdown files with hierarchical structure support.
+
+Author: Attila Gallai <attila@tux-net.hu>
+Created: 2025
+License: MIT License (see LICENSE.txt)
+*/
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 20px;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.title {
+    color: #2c3e50;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 2em;
+}
+
+.subtitle {
+    color: #34495e;
+    font-weight: bold;
+    margin: 8px 0 2px 0;
+    padding: 8px 12px;
+    background-color: #ecf0f1;
+    border-left: 4px solid #3498db;
+    font-size: 1.2em;
+}
+
+.requirement {
+    background-color: #e8f5e8;
+    border-left: 4px solid #27ae60;
+    padding: 10px 15px;
+    margin: 2px 0;
+    border-radius: 4px;
+}
+
+.comment {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 10px 15px;
+    margin: 2px 0;
+    border-radius: 4px;
+    font-style: italic;
+}
+
+.unknown {
+    background-color: #f8f9fa;
+    border-left: 4px solid #6c757d;
+    padding: 10px 15px;
+    margin: 8px 0;
+    border-radius: 4px;
+}
+
+.req-id {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-right: 10px;
+}
+
+/* Indentation classes for hierarchical structure */
+.indent-0 { margin-left: 0px; }
+.indent-1 { margin-left: 30px; }
+.indent-2 { margin-left: 60px; }
+.indent-3 { margin-left: 90px; }
+.indent-4 { margin-left: 120px; }
+.indent-5 { margin-left: 150px; }
+.indent-6 { margin-left: 180px; }
+.indent-7 { margin-left: 210px; }
+.indent-8 { margin-left: 240px; }
+.indent-9 { margin-left: 270px; }
+.indent-10 { margin-left: 300px; }
+
+/* Line number styling */
+.line-number {
+    color: #95a5a6;
+    font-size: 0.8em;
+    margin-right: 10px;
+    transition: opacity 0.3s ease;
+}
+
+.line-number.hidden {
+    display: none;
+}
+
+/* Collapsible element styling */
+.collapsible {
+    position: relative;
+    cursor: pointer;
+}
+
+.collapsible::before {
+    content: "▼";
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8em;
+    color: #3498db;
+    transition: transform 0.3s ease;
+}
+
+.collapsible.collapsed::before {
+    transform: translateY(-50%) rotate(-90deg);
+}
+
+.collapsible-content {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.collapsible-content.collapsed {
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.collapsible-content.expanded {
+    max-height: 1000px;
+}
+
+.has-children {
+    margin-left: 20px;
+}
+
+/* Control buttons styling */
+.controls {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.controls button {
+    margin-right: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.controls .expand-btn {
+    background: #3498db;
+    color: white;
+}
+
+.controls .collapse-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.controls .toggle-btn {
+    background: #9b59b6;
+    color: white;
+}
+
+.controls .print-btn {
+    background: #2ecc71;
+    color: white;
+    margin-right: 0;
+}
+
+/* Print media queries for PDF optimization */
+@media print {
+    .controls {
+        display: none !important;
+    }
+    
+    /* Force background colors to print */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    /* Ensure all element backgrounds are preserved */
+    .subtitle {
+        background-color: #ecf0f1 !important;
+        border-left: 4px solid #3498db !important;
+    }
+    
+    .requirement {
+        background-color: #e8f5e8 !important;
+        border-left: 4px solid #27ae60 !important;
+    }
+    
+    .comment {
+        background-color: #fff3cd !important;
+        border-left: 4px solid #ffc107 !important;
+    }
+    
+    .unknown {
+        background-color: #f8f9fa !important;
+        border-left: 4px solid #6c757d !important;
+    }
+    
+    .title {
+        border-bottom: 3px solid #3498db !important;
+    }
+    
+    /* Print-specific container styling */
+    .container {
+        box-shadow: none;
+        border-radius: 0;
+        margin: 0;
+        padding: 10px;
+        background-color: white !important;
+    }
+    
+    body {
+        margin: 0;
+        background-color: white !important;
+    }
+}

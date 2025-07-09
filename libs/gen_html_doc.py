@@ -5,15 +5,16 @@ This module provides comprehensive HTML generation functionality for converting
 classified requirement document elements into interactive, styled web documents.
 
 Key Capabilities:
-- Generates complete HTML documents with embedded CSS and JavaScript
+- Generates complete HTML documents with configurable CSS styling
 - Creates hierarchical visual representation of document structure
 - Implements interactive expand/collapse functionality for document sections
 - Provides modern, responsive web design with professional styling
 - Ensures print-friendly output with preserved background colors
 - Includes control interface for document manipulation
+- Supports custom stylesheet templates via project configuration
 
 HTML Document Features:
-- Embedded CSS for complete styling (no external dependencies)
+- Configurable CSS stylesheet (default hardcoded template or custom external file)
 - JavaScript for interactive functionality (expand/collapse, line number toggle)
 - Print media queries to optimize PDF generation
 - Responsive design that works on various screen sizes
@@ -43,14 +44,289 @@ Technical Implementation:
 - Semantic HTML structure for accessibility
 
 Dependencies:
-    None - All functionality is self-contained in generated HTML
+    None (self-contained with hardcoded default stylesheet template)
 
 Author: Attila Gallai <attila@tux-net.hu>
 Created: 2025
 License: MIT License (see LICENSE.txt)
 """
 
-def GenerateHTML(classified_parts, title="Requirement Document"):
+import os
+from pathlib import Path
+
+
+def _get_default_style_template():
+    """
+    Get the default CSS stylesheet template as a hardcoded string.
+    
+    This function returns the default styling for HTML requirement documents.
+    It serves as a fallback when no custom stylesheet is specified or when
+    the custom stylesheet file cannot be loaded.
+    
+    Returns:
+        str: Default CSS stylesheet content
+    """
+    return """/* 
+HTML Document Stylesheet Template for Requirement Documents
+
+This stylesheet provides professional styling for requirement documents
+generated from markdown files with hierarchical structure support.
+
+Author: Attila Gallai <attila@tux-net.hu>
+Created: 2025
+License: MIT License (see LICENSE.txt)
+*/
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 20px;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.title {
+    color: #2c3e50;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 2em;
+}
+
+.subtitle {
+    color: #34495e;
+    font-weight: bold;
+    margin: 8px 0 2px 0;
+    padding: 8px 12px;
+    background-color: #ecf0f1;
+    border-left: 4px solid #3498db;
+    font-size: 1.2em;
+}
+
+.requirement {
+    background-color: #e8f5e8;
+    border-left: 4px solid #27ae60;
+    padding: 10px 15px;
+    margin: 2px 0;
+    border-radius: 4px;
+}
+
+.comment {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 10px 15px;
+    margin: 2px 0;
+    border-radius: 4px;
+    font-style: italic;
+}
+
+.unknown {
+    background-color: #f8f9fa;
+    border-left: 4px solid #6c757d;
+    padding: 10px 15px;
+    margin: 8px 0;
+    border-radius: 4px;
+}
+
+.req-id {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-right: 10px;
+}
+
+/* Indentation classes for hierarchical structure */
+.indent-0 { margin-left: 0px; }
+.indent-1 { margin-left: 30px; }
+.indent-2 { margin-left: 60px; }
+.indent-3 { margin-left: 90px; }
+.indent-4 { margin-left: 120px; }
+.indent-5 { margin-left: 150px; }
+.indent-6 { margin-left: 180px; }
+.indent-7 { margin-left: 210px; }
+.indent-8 { margin-left: 240px; }
+.indent-9 { margin-left: 270px; }
+.indent-10 { margin-left: 300px; }
+
+/* Line number styling */
+.line-number {
+    color: #95a5a6;
+    font-size: 0.8em;
+    margin-right: 10px;
+    transition: opacity 0.3s ease;
+}
+
+.line-number.hidden {
+    display: none;
+}
+
+/* Collapsible element styling */
+.collapsible {
+    position: relative;
+    cursor: pointer;
+}
+
+.collapsible::before {
+    content: "▼";
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8em;
+    color: #3498db;
+    transition: transform 0.3s ease;
+}
+
+.collapsible.collapsed::before {
+    transform: translateY(-50%) rotate(-90deg);
+}
+
+.collapsible-content {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.collapsible-content.collapsed {
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.collapsible-content.expanded {
+    max-height: 1000px;
+}
+
+.has-children {
+    margin-left: 20px;
+}
+
+/* Control buttons styling */
+.controls {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.controls button {
+    margin-right: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.controls .expand-btn {
+    background: #3498db;
+    color: white;
+}
+
+.controls .collapse-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.controls .toggle-btn {
+    background: #9b59b6;
+    color: white;
+}
+
+.controls .print-btn {
+    background: #2ecc71;
+    color: white;
+    margin-right: 0;
+}
+
+/* Print media queries for PDF optimization */
+@media print {
+    .controls {
+        display: none !important;
+    }
+    
+    /* Force background colors to print */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    /* Ensure all element backgrounds are preserved */
+    .subtitle {
+        background-color: #ecf0f1 !important;
+        border-left: 4px solid #3498db !important;
+    }
+    
+    .requirement {
+        background-color: #e8f5e8 !important;
+        border-left: 4px solid #27ae60 !important;
+    }
+    
+    .comment {
+        background-color: #fff3cd !important;
+        border-left: 4px solid #ffc107 !important;
+    }
+    
+    .unknown {
+        background-color: #f8f9fa !important;
+        border-left: 4px solid #6c757d !important;
+    }
+    
+    .title {
+        border-bottom: 3px solid #3498db !important;
+    }
+    
+    /* Print-specific container styling */
+    .container {
+        box-shadow: none;
+        border-radius: 0;
+        margin: 0;
+        padding: 10px;
+        background-color: white !important;
+    }
+    
+    body {
+        margin: 0;
+        background-color: white !important;
+    }
+}"""
+
+
+def _load_stylesheet_template(style_template_path=None):
+    """
+    Load the CSS stylesheet template from a file or return the default template.
+    
+    Args:
+        style_template_path (str, optional): Path to custom stylesheet template file.
+                                           If None, uses the default hardcoded template.
+        
+    Returns:
+        str: CSS content from the stylesheet template file or default template
+        
+    Note:
+        If a custom template path is provided but the file cannot be read,
+        the function falls back to the default hardcoded template.
+    """
+    # If no custom template path is provided, use default
+    if not style_template_path:
+        return _get_default_style_template()
+    
+    try:
+        # Try to load custom stylesheet template
+        with open(style_template_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    except (FileNotFoundError, IOError, OSError) as e:
+        # If custom template cannot be loaded, use default
+        print(f"Warning: Could not load custom stylesheet template '{style_template_path}': {e}")
+        print("Using default stylesheet template instead.")
+        return _get_default_style_template()
+
+
+def GenerateHTML(classified_parts, title="Requirement Document", project_config=None):
     """
     Generate a complete interactive HTML document from classified markdown parts.
     
@@ -60,6 +336,7 @@ def GenerateHTML(classified_parts, title="Requirement Document"):
     - Interactive control buttons (expand/collapse all, toggle line numbers, print to PDF)
     - Print-friendly styling with preserved background colors
     - Responsive design with modern CSS styling
+    - Configurable stylesheet template through project configuration
     
     Args:
         classified_parts (list): List of dictionaries containing classified parts from ClassifyParts function.
@@ -71,6 +348,8 @@ def GenerateHTML(classified_parts, title="Requirement Document"):
                                 - description: Processed description text
                                 - children_refs: List of direct references to child elements
         title (str, optional): Title for the HTML document. Defaults to "Requirement Document".
+        project_config (object, optional): Project configuration object that may contain
+                                         get_style_template_path() method for custom styling.
         
     Returns:
         str: Complete HTML document as a string with embedded CSS and JavaScript for interactivity.
@@ -78,10 +357,13 @@ def GenerateHTML(classified_parts, title="Requirement Document"):
              
     Note:
         The generated HTML includes:
-        - CSS for visual styling and print optimization
+        - CSS for visual styling and print optimization (default or custom template)
         - JavaScript for interactive functionality
         - Control buttons that are hidden during printing
         - Color-coded backgrounds for different element types
+        
+        If project_config contains a style_template_path, that custom stylesheet will be used.
+        Otherwise, the default hardcoded stylesheet template is used.
     """
     if not classified_parts:
         return "<html><body><h1>No content to display</h1></body></html>"
@@ -89,176 +371,23 @@ def GenerateHTML(classified_parts, title="Requirement Document"):
     # HTML document structure
     html_content = []
     
-    # HTML header with CSS styling
-    html_content.append('''<!DOCTYPE html>
+    # Determine stylesheet template path from project config
+    style_template_path = None
+    if project_config and hasattr(project_config, 'get_style_template_path'):
+        style_template_path = project_config.get_style_template_path()
+    
+    # Load stylesheet (custom or default)
+    css_content = _load_stylesheet_template(style_template_path)
+    
+    # HTML header with external CSS styling
+    html_content.append(f'''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>''' + title + '''</title>
+    <title>{title}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .title {
-            color: #2c3e50;
-            border-bottom: 3px solid #3498db;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-size: 2em;
-        }
-        .subtitle {
-            color: #34495e;
-            font-weight: bold;
-            margin: 8px 0 2px 0;
-            padding: 8px 12px;
-            background-color: #ecf0f1;
-            border-left: 4px solid #3498db;
-            font-size: 1.2em;
-        }
-        .requirement {
-            background-color: #e8f5e8;
-            border-left: 4px solid #27ae60;
-            padding: 10px 15px;
-            margin: 2px 0;
-            border-radius: 4px;
-        }
-        .comment {
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 10px 15px;
-            margin: 2px 0;
-            border-radius: 4px;
-            font-style: italic;
-        }
-        .unknown {
-            background-color: #f8f9fa;
-            border-left: 4px solid #6c757d;
-            padding: 10px 15px;
-            margin: 8px 0;
-            border-radius: 4px;
-        }
-        .req-id {
-            font-weight: bold;
-            color: #2c3e50;
-            margin-right: 10px;
-        }
-        .indent-0 { margin-left: 0px; }
-        .indent-1 { margin-left: 30px; }
-        .indent-2 { margin-left: 60px; }
-        .indent-3 { margin-left: 90px; }
-        .indent-4 { margin-left: 120px; }
-        .indent-5 { margin-left: 150px; }
-        .indent-6 { margin-left: 180px; }
-        .indent-7 { margin-left: 210px; }
-        .indent-8 { margin-left: 240px; }
-        .indent-9 { margin-left: 270px; }
-        .indent-10 { margin-left: 300px; }
-        .line-number {
-            color: #95a5a6;
-            font-size: 0.8em;
-            margin-right: 10px;
-            transition: opacity 0.3s ease;
-        }
-        .line-number.hidden {
-            display: none;
-        }
-        .collapsible {
-            position: relative;
-            cursor: pointer;
-        }
-        .collapsible::before {
-            content: "▼";
-            position: absolute;
-            left: -20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.8em;
-            color: #3498db;
-            transition: transform 0.3s ease;
-        }
-        .collapsible.collapsed::before {
-            transform: translateY(-50%) rotate(-90deg);
-        }
-        .collapsible-content {
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-        .collapsible-content.collapsed {
-            max-height: 0;
-            margin: 0;
-            padding: 0;
-        }
-        .collapsible-content.expanded {
-            max-height: 1000px;
-        }
-        .has-children {
-            margin-left: 20px;
-        }
-        
-        /* Hide control buttons during print */
-        @media print {
-            .controls {
-                display: none !important;
-            }
-            
-            /* Force background colors to print */
-            * {
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            
-            /* Ensure all element backgrounds are preserved */
-            .subtitle {
-                background-color: #ecf0f1 !important;
-                border-left: 4px solid #3498db !important;
-            }
-            
-            .requirement {
-                background-color: #e8f5e8 !important;
-                border-left: 4px solid #27ae60 !important;
-            }
-            
-            .comment {
-                background-color: #fff3cd !important;
-                border-left: 4px solid #ffc107 !important;
-            }
-            
-            .unknown {
-                background-color: #f8f9fa !important;
-                border-left: 4px solid #6c757d !important;
-            }
-            
-            .title {
-                border-bottom: 3px solid #3498db !important;
-            }
-            
-            /* Optional: Adjust other print-specific styles */
-            .container {
-                box-shadow: none;
-                border-radius: 0;
-                margin: 0;
-                padding: 10px;
-                background-color: white !important;
-            }
-            
-            body {
-                margin: 0;
-                background-color: white !important;
-            }
-        }
+{css_content}
     </style>
 </head>
 <body>
@@ -356,11 +485,11 @@ def GenerateHTML(classified_parts, title="Requirement Document"):
             const controls = document.createElement('div');
             controls.className = 'controls';
             controls.innerHTML = `
-                <div style="margin-bottom: 20px; text-align: right;">
-                    <button onclick="expandAll()" style="margin-right: 10px; padding: 5px 10px; background: #3498db; color: white; border: none; border-radius: 3px; cursor: pointer;">Expand All</button>
-                    <button onclick="collapseAll()" style="margin-right: 10px; padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer;">Collapse All</button>
-                    <button id="toggle-line-numbers" onclick="toggleLineNumbers()" style="margin-right: 10px; padding: 5px 10px; background: #9b59b6; color: white; border: none; border-radius: 3px; cursor: pointer;">Hide Line Numbers</button>
-                    <button onclick="printToPDF()" style="padding: 5px 10px; background: #2ecc71; color: white; border: none; border-radius: 3px; cursor: pointer;">Print as PDF</button>
+                <div>
+                    <button class="expand-btn" onclick="expandAll()">Expand All</button>
+                    <button class="collapse-btn" onclick="collapseAll()">Collapse All</button>
+                    <button class="toggle-btn" id="toggle-line-numbers" onclick="toggleLineNumbers()">Hide Line Numbers</button>
+                    <button class="print-btn" onclick="printToPDF()">Print as PDF</button>
                 </div>
             `;
             container.insertBefore(controls, container.firstChild);
