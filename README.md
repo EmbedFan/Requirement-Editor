@@ -2,52 +2,50 @@
 
 ## Project Overview
 
-The Requirement Editor is a sophisticated Python-based tool that converts markdown-formatted requirement documents into interactive, styled HTML documents. The system features a modular architecture with specialized components for parsing, classification, hierarchy building, and HTML generation, providing a complete solution for managing hierarchical requirements with modern web presentation capabilities.
+The Requirement Editor is a sophisticated Python-based tool for converting markdown-formatted technical requirement documents into professional, interactive HTML documents with modern web features. The system implements a complete document processing pipeline with intelligent parsing, hierarchical structure building, and advanced HTML generation capabilities.
+
+**Key Features:**
+- **Intelligent Document Parsing**: Automatic classification of requirement elements (titles, subtitles, requirements, comments)
+- **Hierarchical Structure Building**: Stack-based algorithm for building parent-child relationships
+- **Interactive HTML Generation**: Professional web documents with expand/collapse functionality
+- **Modern Web Features**: Responsive design, print optimization, and accessibility support
+- **Command-Line Interface**: Comprehensive CLI for batch processing and automation
+- **Configurable Styling**: Support for custom CSS templates and professional theming
+- **Robust Error Handling**: Comprehensive validation and graceful error recovery
 
 **Author:** Attila Gallai <attila@tux-net.hu>  
-**Created:** 2025  
-**Last Updated:** 2025-07-09 14:40  
-**Last Updated:** July 2025
-
-## Project Structure
-
-```
-python/
-├── README.md                  # This file - Complete project documentation
-├── main.py                    # Main entry point and workflow orchestrator
-├── libs/                      # Core functionality modules
-│   ├── parse_req_md.py       # Markdown parsing and classification engine
-│   ├── gen_html_doc.py       # HTML generation and styling module
-│   └── project.py            # Project configuration management module
-├── docs/                      # Comprehensive documentation
-│   ├── README.md             # Project overview (duplicate of this file)
-│   ├── main.md               # main.py detailed documentation
-│   ├── parse_req_md.md       # Parsing module detailed documentation
-│   ├── gen_html_doc.md       # HTML generation module detailed documentation
-│   └── project.md            # Project configuration module detailed documentation
-├── test/                      # Test suite (renamed from tests/)
-│   ├── README.md             # Test suite documentation
-│   ├── test_runner.py        # Test runner for all test modules
-│   ├── test_comprehensive.py # Comprehensive integration tests
-│   ├── test_project_config.py # Project configuration tests
-│   ├── test_simple.py        # Simple unit tests
-│   └── data/                 # Test data files
-│       ├── test_input.md     # Sample requirement document for testing
-│       └── test_input.html   # Expected HTML output for testing
-└── LICENSE                    # MIT License
-```
-
-## Quick Start
-
-1. **Prerequisites**: Python 3.6+ (no external dependencies required)
-2. **Configuration**: Edit `cfg_inputfile` in `main.py` to point to your markdown file
-3. **Execution**: Run `python main.py` from the python directory
-4. **Output**: HTML file generated with same name as input but `.html` extension
+**Created:** 2025-07-09  
+**Version:** 1.0.0  
+**License:** MIT License (see LICENSE.txt)
 
 ## System Architecture
 
-### Modular Design Philosophy
-The application follows a clean separation of concerns with three distinct layers:
+### Core Module Architecture
+The application follows a sophisticated modular design with clear separation of concerns:
+
+```
+Requirement Editor Application Stack
+├── main.py                    # Application orchestrator and CLI interface
+├── libs/parse_req_md.py      # Markdown parsing and element classification
+├── libs/gen_html_doc.py      # HTML generation with interactive features
+└── libs/project.py           # Project configuration management
+```
+
+### Processing Pipeline
+1. **Input Processing**: Command-line argument parsing and file validation
+2. **Document Parsing**: Markdown content analysis and element classification
+3. **Structure Building**: Hierarchical relationship construction using stack algorithm
+4. **HTML Generation**: Template-based rendering with embedded CSS and JavaScript
+5. **Output Generation**: File writing with proper encoding and error handling
+
+### Enhanced Documentation
+All core modules now include comprehensive inline documentation covering:
+- **Architectural Overview**: System design and integration points
+- **Algorithm Implementation**: Detailed technical specifications
+- **API Documentation**: Complete function and class references
+- **Usage Examples**: Practical implementation patterns
+- **Error Handling**: Comprehensive error scenarios and recovery strategies
+- **Performance Considerations**: Optimization techniques and best practices
 
 ```
 ┌─────────────────┐

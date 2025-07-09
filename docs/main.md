@@ -6,28 +6,47 @@
 
 ## Overview
 
-The `main.py` module serves as the main entry point and workflow orchestrator for the Markdown Requirements Document to Interactive HTML Converter. This application coordinates the complete process of converting markdown-formatted requirement documents into interactive, styled HTML documents with hierarchical organization and modern web features.
+The `main.py` module serves as the primary application orchestrator and command-line interface for the Requirement Editor, coordinating the complete workflow from markdown requirements parsing to interactive HTML document generation with advanced web features.
 
 **Author:** Attila Gallai <attila@tux-net.hu>  
-**Created:** 2025  
-**Last Updated:** 2025-07-09 14:40
+**Created:** 2025-07-09  
+**Version:** 1.0.0  
+**License:** MIT License
 
-## Key Features
+## Enhanced Architecture
 
-- **Workflow Orchestration**: Coordinates the complete conversion process from markdown parsing to HTML generation
-- **Console Interface**: Provides detailed progress information and debugging output
-- **File I/O Management**: Handles input file reading and HTML output saving with proper error handling
-- **Configuration Management**: Centralized configuration for input file paths and processing options
-- **Error Reporting**: Comprehensive error handling and user feedback throughout the process
-
-## Architecture Overview
-
-The module follows a modular architecture where `main.py` acts as the coordinator:
+### Application Orchestration
+The module implements a sophisticated workflow management system that coordinates multiple specialized components:
 
 ```
-main.py (Orchestrator)
-├── libs.parse_req_md (Markdown Parsing)
-│   ├── ReadMDFile()
+Main Application Pipeline
+├── Command Line Processing     # Argument parsing and validation
+├── File Input Management      # UTF-8 markdown file reading
+├── Document Parsing          # Element classification and hierarchy building
+├── Console Reporting         # Detailed progress and debugging output
+├── HTML Generation          # Template-based interactive document creation
+└── File Output Management   # HTML writing with error handling
+```
+
+### Key Enhancements
+
+#### **Comprehensive CLI Interface**
+- **Help System**: Detailed usage information with examples and options
+- **File Conversion**: Direct markdown-to-HTML conversion with path validation
+- **Error Handling**: Graceful error recovery with informative messages
+- **Exit Codes**: Proper system integration with shell scripting support
+
+#### **Advanced Workflow Coordination**
+- **Multi-stage Processing**: Coordinated pipeline with validation at each step
+- **Progress Reporting**: Real-time feedback on processing status
+- **Error Recovery**: Intelligent error handling with user guidance
+- **Performance Optimization**: Efficient resource management and processing
+
+#### **Enhanced Documentation**
+- **Comprehensive Inline Documentation**: Detailed technical specifications
+- **API Documentation**: Complete function and parameter references
+- **Integration Examples**: Practical usage patterns and best practices
+- **Error Scenarios**: Complete error handling documentation
 │   ├── ClassifyParts()
 │   └── _build_hierarchy()
 ├── libs.gen_html_doc (HTML Generation)

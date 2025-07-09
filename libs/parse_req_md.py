@@ -1,31 +1,127 @@
 """
 Markdown Requirements Document Parser Module
 
-This module provides functionality to parse and classify markdown-formatted requirement 
-documents into structured hierarchical elements. It handles identification of different 
-document element types and builds parent-child relationships based on indentation.
+This module provides sophisticated parsing functionality for markdown-formatted technical
+requirement documents, converting unstructured text into classified hierarchical elements
+with proper parent-child relationships and metadata extraction.
 
-Key Features:
-- Parses markdown content to identify titles, subtitles, requirements, and comments
-- Builds hierarchical structure based on HTML &nbsp; indentation
-- Maintains traceability through line number references
-- Processes comment descriptions by removing asterisk formatting
-- Uses stack-based algorithm for efficient hierarchy building
+Core Functionality:
+The parser implements a multi-stage processing pipeline that first reads markdown content,
+then classifies each line based on formatting patterns, and finally builds a hierarchical
+structure using a stack-based algorithm. This approach ensures accurate representation
+of document structure while maintaining traceability to source line numbers.
 
-Document Structure Support:
-- Titles: Lines starting with '#' (highest hierarchy level)
-- Subtitles: Lines with &nbsp; indentation and **bold** formatting
-- Requirements: Lines with &nbsp; + number + "Req:" pattern
-- Comments: Lines with &nbsp; + number + "Comm:" pattern (asterisks auto-removed)
-- Unknown: Any other content (preserved with appropriate indentation)
+Document Structure Analysis:
+- Titles: Lines starting with '#' character (markdown heading syntax)
+- Subtitles: Lines with HTML &nbsp; indentation followed by **bold** formatting
+- Requirements: Lines with &nbsp; indentation + number + "Req:" pattern
+- Comments: Lines with &nbsp; indentation + number + "Comm:" pattern (asterisks auto-removed)
+- Unknown: Any other content (preserved with appropriate indentation level)
 
-Indentation System:
-- Every 2 &nbsp; HTML entities = 1 indentation level
-- Parent-child relationships built using stack-based algorithm
-- Supports up to 10 indentation levels with CSS styling
+Indentation Processing System:
+The parser uses HTML &nbsp; entities as indentation markers, where every 2 consecutive
+&nbsp; entities represent one indentation level. This system provides precise control
+over hierarchical structure and is compatible with markdown editors that preserve
+HTML entities.
+
+Indentation Rules:
+- Base level (0): No &nbsp; entities - typically document titles
+- Level 1: &nbsp;&nbsp; (2 entities) - major sections and subtitles
+- Level 2: &nbsp;&nbsp;&nbsp;&nbsp; (4 entities) - subsections and requirements
+- Level n: 2n &nbsp; entities - supports unlimited nesting depth
+
+Pattern Recognition:
+- Requirement Pattern: /^\d+\s+Req:\s*(.+)$/ - captures ID and description
+- Comment Pattern: /^\d+\s+Comm:\s*(.+)$/ - captures ID and description with asterisk removal
+- Subtitle Pattern: /^\*\*(.+)\*\*$/ - captures bold-formatted section headers
+- Title Pattern: /^#+\s*(.+)$/ - captures markdown heading levels (# ## ### etc.)
+
+Hierarchical Structure Building:
+The module implements a sophisticated stack-based algorithm for building parent-child
+relationships based on indentation levels. This ensures accurate representation of
+document structure while handling complex nesting scenarios.
+
+Algorithm Features:
+- Stack-based tracking of parent elements at each indentation level
+- Automatic parent assignment based on indentation hierarchy
+- Children list population for expand/collapse functionality
+- Robust handling of indentation inconsistencies and edge cases
+
+Metadata Extraction:
+Each parsed element includes comprehensive metadata for downstream processing:
+- line_number: Source line reference for traceability
+- type: Element classification (TITLE, SUBTITLE, REQUIREMENT, COMMENT, UNKNOWN)
+- description: Processed text content with formatting removed
+- indent: Calculated indentation level for hierarchy
+- id: Numeric identifier for requirements and comments
+- parent: Reference to parent element (None for root elements)
+- children: List of child element references for hierarchy navigation
+
+Text Processing Features:
+- Automatic asterisk removal from comment descriptions for clean presentation
+- Preservation of original formatting within description text
+- Unicode and international character support via UTF-8 encoding
+- Whitespace normalization while preserving intentional formatting
+
+Error Handling and Robustness:
+- Graceful handling of malformed requirement/comment patterns
+- Fallback classification for unrecognized content
+- Comprehensive file I/O error handling with descriptive messages
+- Validation of input parameters and data structures
+
+Integration Points:
+This module serves as the foundation for the HTML generation pipeline, providing
+structured data that can be consumed by template engines and rendering systems.
+The hierarchical structure with parent-child relationships enables sophisticated
+document navigation and interactive features.
+
+Performance Considerations:
+- Single-pass parsing algorithm for efficiency with large documents
+- Memory-efficient stack-based hierarchy building
+- Minimal regex compilation overhead through compiled pattern reuse
+- Optimized for documents with hundreds of requirements
+
+Example Input Format:
+```
+# System Requirements Specification
+
+&nbsp;&nbsp;**User Interface Requirements**
+
+&nbsp;&nbsp;&nbsp;&nbsp;1001 Req: The system shall provide a graphical user interface.
+
+&nbsp;&nbsp;&nbsp;&nbsp;*1001 Comm: This requirement covers the basic UI framework.*
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1002 Req: The UI shall be responsive and mobile-friendly.
+```
+
+Example Output Structure:
+```
+[
+    {
+        'line_number': 1,
+        'type': 'TITLE',
+        'description': 'System Requirements Specification',
+        'indent': 0,
+        'id': None,
+        'parent': None,
+        'children': [3]
+    },
+    {
+        'line_number': 3,
+        'type': 'SUBTITLE',
+        'description': 'User Interface Requirements',
+        'indent': 1,
+        'id': None,
+        'parent': 1,
+        'children': [5, 7, 9]
+    },
+    ...
+]
+```
 
 Author: Attila Gallai <attila@tux-net.hu>
-Created: 2025
+Created: 2025-07-09
+Version: 1.0.0
 License: MIT License (see LICENSE.txt)
 """
 

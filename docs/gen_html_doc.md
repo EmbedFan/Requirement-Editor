@@ -6,28 +6,53 @@
 
 ## Overview
 
-The `gen_html_doc.py` module provides comprehensive HTML generation functionality for converting classified requirement document elements into interactive, styled web documents. This module is part of the `libs` package and focuses exclusively on HTML document creation.
+The `gen_html_doc.py` module provides sophisticated HTML generation functionality for converting structured requirement elements into professional, interactive web documents with advanced styling, responsive design, and modern web features.
 
 **Author:** Attila Gallai <attila@tux-net.hu>  
-**Created:** 2025  
-**Last Updated:** 2025-07-09 14:40  
+**Created:** 2025-07-09  
+**Version:** 1.0.0  
 **Location:** `libs/gen_html_doc.py`
 
-## Key Capabilities
+## Enhanced Architecture
 
-- **Complete HTML Generation**: Creates full HTML documents with embedded CSS and JavaScript
-- **Hierarchical Visualization**: Represents document structure visually with proper nesting
-- **Interactive Functionality**: Implements expand/collapse functionality for document sections
-- **Modern Web Design**: Provides responsive, professional styling
-- **Print Optimization**: Ensures print-friendly output with preserved background colors
-- **Control Interface**: Includes interactive control buttons for document manipulation
+### Advanced HTML Generation System
+The module implements a comprehensive template-based rendering system:
 
-## HTML Document Features
+```
+HTML Generation Pipeline
+├── Template Management       # Default and custom stylesheet handling
+├── Content Processing       # Element transformation and HTML escaping
+├── Structure Assembly      # Hierarchical HTML document construction
+├── Style Integration      # CSS embedding and responsive design
+├── Script Integration     # JavaScript functionality and interactivity
+└── Document Optimization  # Performance and accessibility enhancements
+```
 
-### Embedded Resources
-- **CSS Styling**: Complete styling embedded in HTML (no external dependencies)
-- **JavaScript Functionality**: Interactive features built-in
-- **Print Media Queries**: Automatic optimization for PDF generation
+### Key Enhancements
+
+#### **Sophisticated Template System**
+- **Dual Template Mode**: Hardcoded default and external custom stylesheet support
+- **Template Validation**: Comprehensive validation and error handling for custom templates
+- **Fallback Mechanisms**: Graceful degradation when custom templates are unavailable
+- **Dynamic Content Injection**: Intelligent placeholder replacement and content integration
+
+#### **Advanced Interactive Features**
+- **Modern JavaScript Implementation**: ES6+ syntax with backward compatibility
+- **State Management**: Sophisticated expand/collapse state tracking
+- **Event Handling**: Efficient event delegation and user interaction management
+- **Performance Optimization**: Minimized DOM manipulation and efficient rendering
+
+#### **Professional Web Design**
+- **Responsive Framework**: Mobile-first design with progressive enhancement
+- **Accessibility Support**: WCAG compliance and semantic HTML structure
+- **Print Optimization**: Advanced CSS media queries for PDF generation
+- **Cross-browser Compatibility**: Extensive testing and compatibility measures
+
+#### **Enhanced Documentation**
+- **Technical Specifications**: Detailed implementation documentation
+- **Template Development Guide**: Custom stylesheet creation guidelines
+- **Integration Patterns**: Best practices for module integration
+- **Performance Guidelines**: Optimization techniques and recommendations
 - **Responsive Design**: Works on various screen sizes
 - **Modern Standards**: Uses current web technologies
 

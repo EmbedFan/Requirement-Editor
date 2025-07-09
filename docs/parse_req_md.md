@@ -6,28 +6,47 @@
 
 ## Overview
 
-The `parse_req_md.py` module provides comprehensive functionality for parsing and classifying markdown-formatted requirement documents into structured hierarchical elements. This module is the core parsing engine that handles document structure analysis and hierarchy building.
+The `parse_req_md.py` module provides sophisticated parsing functionality for markdown-formatted technical requirement documents, implementing advanced algorithms for document structure analysis, element classification, and hierarchical relationship building.
 
 **Author:** Attila Gallai <attila@tux-net.hu>  
-**Created:** 2025  
-**Last Updated:** 2025-07-09 14:40  
+**Created:** 2025-07-09  
+**Version:** 1.0.0  
 **Module Location:** `libs/parse_req_md.py`
 
-## Key Features
+## Enhanced Architecture
 
-- **Document Element Classification**: Identifies titles, subtitles, requirements, and comments
-- **Hierarchical Structure Building**: Creates parent-child relationships based on indentation
-- **Indentation Processing**: Handles HTML `&nbsp;` entities for precise indentation control
-- **Comment Processing**: Automatically removes asterisk formatting from comments
-- **Line Number Traceability**: Maintains references to original source line numbers
-- **Robust Error Handling**: Graceful handling of file I/O operations and malformed input
+### Advanced Parsing Engine
+The module implements a multi-stage processing pipeline with sophisticated algorithms:
 
-## Document Structure Support
+```
+Parsing Pipeline
+├── File Input Processing      # UTF-8 markdown file reading with error handling
+├── Content Preprocessing     # Line-by-line analysis and cleaning
+├── Pattern Recognition      # Regex-based element type identification
+├── Metadata Extraction     # ID numbers, descriptions, and formatting removal
+├── Hierarchy Building      # Stack-based parent-child relationship construction
+└── Structure Validation   # Data integrity verification and error correction
+```
 
-| Element Type | Pattern | Description | Indent Calculation |
-|--------------|---------|-------------|-------------------|
-| **TITLE** | Lines starting with '#' | Highest hierarchy level | Always indent = 0 |
-| **SUBTITLE** | `&nbsp;` + `**text**` | Section headers | Based on `&nbsp;` count |
+### Key Enhancements
+
+#### **Sophisticated Pattern Recognition**
+- **Multi-pattern Regex System**: Advanced pattern matching for complex document structures
+- **Context-aware Classification**: Intelligent element type determination based on surrounding content
+- **Robust Text Processing**: Unicode support and international character handling
+- **Format Normalization**: Consistent text processing with whitespace and formatting cleanup
+
+#### **Advanced Hierarchy Building**
+- **Stack-based Algorithm**: Efficient parent-child relationship construction
+- **Indentation Processing**: Precise HTML entity counting for hierarchy determination
+- **Relationship Validation**: Automatic correction of malformed hierarchical structures
+- **Performance Optimization**: Optimized algorithms for large document processing
+
+#### **Enhanced Documentation**
+- **Comprehensive Technical Specifications**: Detailed algorithm documentation
+- **Pattern Recognition Details**: Complete regex pattern explanations
+- **Integration Guidelines**: Best practices for module integration
+- **Performance Analysis**: Algorithmic complexity and optimization notes
 | **REQUIREMENT** | `&nbsp;` + number + "Req:" | Functional requirements | Based on `&nbsp;` count |
 | **COMMENT** | `&nbsp;` + number + "Comm:" | Additional information | Based on `&nbsp;` count |
 | **UNKNOWN** | Any other content | Preserved content | Based on `&nbsp;` count |

@@ -1,27 +1,29 @@
 """
 Project Configuration Manager Module
 
-This module provides functionality to manage project configuration files in JSON format
-for the Requirement Editor application. It handles creation, loading, saving, and updating
-of project configuration data including file paths, timestamps, and version information.
+This module provides comprehensive project configuration management functionality for
+the Requirement Editor application, handling creation, persistence, and maintenance
+of project metadata in JSON format with robust error handling and validation.
 
-Key Features:
-- Creates and manages JSON-based project configuration files
-- Tracks input markdown file paths and project metadata
-- Maintains creation and modification timestamps in standardized format
-- Handles application version tracking for compatibility
-- Provides comprehensive error handling for file operations
-- Supports project configuration validation and migration
-- Enforces configuration file creation in working directory for proper organization
+Core Functionality:
+The ProjectConfig class serves as the central configuration management system,
+providing a clean interface for managing project settings, file paths, timestamps,
+and application metadata. It implements a JSON-based storage system with automatic
+working directory enforcement and comprehensive validation.
 
-Configuration Data Structure:
-- input_md_file_path: Path to the source markdown requirements document
-- project_creation_date: When the project was first created (YYYY-MM-DD HH:MM)
-- project_last_modification_date: When the project was last modified (YYYY-MM-DD HH:MM)
-- application_version: Version of the Requirement Editor used
-- style_template_path: Optional path to custom CSS stylesheet template file
+Configuration Management Features:
+- JSON-based configuration file storage with human-readable format
+- Automatic creation and modification timestamp tracking with ISO format
+- Application version compatibility tracking for upgrade scenarios
+- Custom stylesheet template path management for UI customization
+- Working directory policy enforcement for organized project structure
+- Comprehensive validation and error handling for all operations
 
-JSON Schema:
+Data Structure and Schema:
+The configuration system maintains a well-defined JSON schema that ensures
+consistency and compatibility across application versions:
+
+```json
 {
     "input_md_file_path": "path/to/requirements.md",
     "project_creation_date": "2025-07-09 14:40",
@@ -29,15 +31,85 @@ JSON Schema:
     "application_version": "1.0.0",
     "style_template_path": "path/to/custom_stylesheet.css"
 }
+```
+
+Field Descriptions:
+- input_md_file_path: Path to the source markdown requirements document
+- project_creation_date: ISO timestamp when project was first created
+- project_last_modification_date: ISO timestamp of last configuration change
+- application_version: Version of Requirement Editor for compatibility tracking
+- style_template_path: Optional path to custom CSS stylesheet template
 
 Working Directory Policy:
-All project configuration files are created in the current working directory to ensure
-proper project organization and prevent configuration files from being scattered across
-the filesystem. Convenience functions automatically generate appropriate filenames and
-enforce this policy.
+All project configuration files are automatically created in the current working
+directory to ensure proper project organization and prevent configuration file
+scatter across the filesystem. This policy promotes consistent project structure
+and simplifies configuration management.
+
+File Naming Conventions:
+- Default configuration files use descriptive names based on input file
+- Automatic .json extension handling for consistency
+- Collision detection and resolution for existing files
+- Support for custom configuration file names and paths
+
+Timestamp Management:
+The system automatically manages creation and modification timestamps using
+standardized ISO format (YYYY-MM-DD HH:MM) for consistency and readability.
+Timestamps are updated automatically on configuration changes and provide
+audit trail functionality.
+
+Error Handling and Validation:
+- Comprehensive JSON parsing with detailed error messages
+- File I/O error handling with recovery suggestions
+- Input validation for all configuration parameters
+- Graceful degradation for missing or corrupted configuration files
+- Automatic backup and recovery mechanisms
+
+Integration Points:
+- Seamless integration with HTML generation module for custom stylesheets
+- Compatible with main application workflow for configuration persistence
+- Extensible architecture for additional configuration parameters
+- API-compatible with existing project management systems
+
+Performance Considerations:
+- Lazy loading of configuration data for improved startup performance
+- Efficient JSON serialization with minimal memory footprint
+- Cached configuration access for repeated operations
+- Optimized file I/O with appropriate buffering strategies
+
+Security Considerations:
+- Safe JSON parsing with validation to prevent injection attacks
+- Secure file handling with appropriate permissions
+- Path validation to prevent directory traversal vulnerabilities
+- Input sanitization for all user-provided configuration data
+
+Example Usage Patterns:
+```python
+# Create new project configuration
+config = ProjectConfig.create("requirements.md", "project_config.json")
+
+# Load existing configuration
+config = ProjectConfig("existing_config.json")
+
+# Update stylesheet path
+config.set_style_template_path("custom_styles.css")
+
+# Save configuration changes
+config.save()
+
+# Access configuration data
+input_file = config.get_input_md_file_path()
+creation_date = config.get_project_creation_date()
+```
+
+Migration and Compatibility:
+The module supports configuration migration between application versions,
+ensuring backward compatibility while enabling new features. Version tracking
+allows for intelligent upgrades and compatibility warnings.
 
 Author: Attila Gallai <attila@tux-net.hu>
-Created: 2025
+Created: 2025-07-09
+Version: 1.0.0
 License: MIT License (see LICENSE.txt)
 """
 

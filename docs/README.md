@@ -6,28 +6,40 @@
 
 ## Project Overview
 
-The Requirement Editor is a Python-based tool that converts markdown-formatted requirement documents into interactive, styled HTML documents. The system provides a complete solution for managing hierarchical requirements with modern web presentation capabilities using a modular architecture.
+The Requirement Editor is a sophisticated Python-based tool for converting markdown-formatted technical requirement documents into professional, interactive HTML documents with modern web features. The system implements a complete document processing pipeline with intelligent parsing, hierarchical structure building, and advanced HTML generation capabilities.
 
 **Author:** Attila Gallai <attila@tux-net.hu>  
-**Created:** 2025  
-**Last Updated:** 2025-01-09 17:35
+**Created:** 2025-07-09  
+**Version:** 1.0.0  
+**License:** MIT License
 
-## Project Structure
+## Enhanced Documentation Structure
+
+This documentation reflects the comprehensive inline documentation updates implemented across all core modules. Each module now includes detailed technical specifications, architectural overviews, and integration guidelines.
+
+### Documentation Features
+- **Comprehensive Technical Specifications**: Detailed algorithm and implementation documentation
+- **API Documentation**: Complete function and class references with examples
+- **Integration Guidelines**: Best practices for module integration and extension
+- **Performance Analysis**: Optimization techniques and performance considerations
+- **Error Handling**: Comprehensive error scenarios and recovery strategies
+
+## Updated Project Structure
 
 ```
 python/
-├── main.py                    # Main entry point and workflow orchestrator
+├── main.py                    # Enhanced CLI interface and workflow orchestrator
 ├── libs/
-│   ├── parse_req_md.py       # Markdown parsing and classification module
-│   ├── gen_html_doc.py       # HTML generation module
-│   └── project.py            # Project configuration management module
+│   ├── parse_req_md.py       # Advanced parsing engine with sophisticated algorithms
+│   ├── gen_html_doc.py       # Professional HTML generation with interactive features
+│   └── project.py            # Comprehensive configuration management system
 ├── test/
-│   ├── test_runner.py        # Automated test runner script
-│   ├── test_reporter.py      # HTML test report generator
-│   ├── test_project_config.py # Project configuration tests
-│   ├── test_comprehensive.py # Complete workflow tests
-│   ├── test_simple.py        # Basic functionality tests  
-│   ├── test_mixed_results.py # Mixed result demonstration tests
+│   ├── test_runner.py        # Automated test runner with HTML reporting
+│   ├── test_cli.py           # Complete CLI interface testing suite
+│   ├── test_project_config.py # Project configuration validation tests
+│   ├── test_comprehensive.py # End-to-end integration testing
+│   ├── test_simple.py        # Core functionality unit tests
+│   └── test_stylesheet_config.py # Stylesheet configuration testing
 │   ├── data/
 │   │   ├── test_input.md     # Sample requirement document for testing
 │   │   └── test_input.html   # Generated HTML output (created by tests)

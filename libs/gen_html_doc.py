@@ -1,53 +1,144 @@
 """
-HTML Document Generation Module for Requirement Documents
+Interactive HTML Document Generation Module for Requirement Documents
 
-This module provides comprehensive HTML generation functionality for converting
-classified requirement document elements into interactive, styled web documents.
+This module provides comprehensive HTML generation functionality for converting structured
+requirement document elements into professional, interactive web documents with modern
+styling, responsive design, and advanced user interaction features.
 
-Key Capabilities:
-- Generates complete HTML documents with configurable CSS styling
-- Creates hierarchical visual representation of document structure
-- Implements interactive expand/collapse functionality for document sections
-- Provides modern, responsive web design with professional styling
-- Ensures print-friendly output with preserved background colors
-- Includes control interface for document manipulation
-- Supports custom stylesheet templates via project configuration
+Core Architecture:
+The HTML generator operates as a template-based rendering system that transforms classified
+requirement elements into semantically structured HTML with embedded CSS and JavaScript.
+The system supports both hardcoded default styling and external custom stylesheet templates
+for maximum flexibility in document presentation.
 
-HTML Document Features:
-- Configurable CSS stylesheet (default hardcoded template or custom external file)
-- JavaScript for interactive functionality (expand/collapse, line number toggle)
-- Print media queries to optimize PDF generation
-- Responsive design that works on various screen sizes
-- Color-coded element types for visual distinction
-- Smooth animations and transitions for better user experience
+Document Generation Pipeline:
+1. **Template Selection**: Chooses between hardcoded default or custom stylesheet template
+2. **Content Classification**: Processes structured element data from parser module
+3. **HTML Structure Building**: Creates semantic HTML with proper hierarchy and navigation
+4. **CSS Integration**: Embeds responsive styling with print media queries
+5. **JavaScript Integration**: Adds interactive functionality and user controls
+6. **Document Assembly**: Combines all components into complete HTML document
 
-Element Type Styling:
-- TITLE: Large headers with blue underline (highest visual prominence)
-- SUBTITLE: Bold section headers with gray background and blue left border
-- REQUIREMENT: Green-accented boxes with clear requirement identification
-- COMMENT: Yellow-accented boxes with italic text for comments
-- UNKNOWN: Gray-accented boxes for unrecognized content
+Styling System Architecture:
+The module implements a sophisticated CSS framework with multiple layers:
+- Base styles for typography, layout, and responsive design
+- Element-specific styles for different requirement types
+- Interactive states for hover, focus, and active elements
+- Print media queries for professional PDF output
+- CSS custom properties for consistent theming
 
-Interactive Features:
-- Click-to-expand/collapse for all elements except titles
-- "Expand All" and "Collapse All" buttons for bulk operations
-- Line number toggle for reference/clean view switching
-- "Print to PDF" button for document export
-- All controls automatically hidden during printing
+Element Type Visual Design:
+- TITLE: Large headers with distinctive blue underline (2-3em font size)
+- SUBTITLE: Bold section headers with gray background and blue left border accent
+- REQUIREMENT: Green-accented containers with clear requirement identification
+- COMMENT: Yellow-accented containers with italic text styling for distinction
+- UNKNOWN: Gray-accented containers for unclassified content with neutral styling
 
-Technical Implementation:
-- Uses CSS flexbox and modern web standards
-- Implements CSS variables for consistent theming
-- JavaScript uses modern DOM manipulation techniques
-- Print styles use CSS @media queries for automatic switching
-- HTML escaping prevents XSS vulnerabilities
-- Semantic HTML structure for accessibility
+Interactive Features Implementation:
+- **Expand/Collapse System**: JavaScript-powered section folding with smooth CSS transitions
+- **Line Number Toggle**: Show/hide line references for clean vs. technical view
+- **Bulk Operations**: Expand All and Collapse All buttons for document-wide control
+- **Print Optimization**: Automatic control hiding and expanded state for PDF generation
+- **Responsive Design**: Mobile-friendly layout with touch-optimized interaction areas
 
-Dependencies:
-    None (self-contained with hardcoded default stylesheet template)
+JavaScript Functionality:
+- Modern ES6+ syntax with backward compatibility considerations
+- DOM manipulation using vanilla JavaScript (no external dependencies)
+- Event delegation for efficient handling of dynamic content
+- State management for expand/collapse and line number visibility
+- Print detection and automatic document optimization
+
+CSS Framework Features:
+- Flexbox-based layout system for consistent alignment and spacing
+- CSS Grid for complex layout scenarios and responsive behavior
+- Custom CSS properties (variables) for maintainable theming
+- Smooth transitions and animations for professional user experience
+- Print-specific styles with @media queries for PDF optimization
+
+Responsive Design Implementation:
+- Mobile-first approach with progressive enhancement
+- Breakpoint-based responsive behavior for various screen sizes
+- Touch-friendly interaction areas with appropriate sizing
+- Optimized typography scales for different viewport sizes
+- Accessible design following WCAG guidelines
+
+Print Media Optimization:
+- Automatic background color preservation for PDF generation
+- Control button hiding during print operations
+- Optimized typography and spacing for paper output
+- Expanded content state for complete document visibility
+- Page break optimization for professional document layout
+
+Template System:
+The module supports two template modes:
+1. **Default Hardcoded Template**: Complete self-contained CSS embedded in HTML
+2. **Custom External Template**: Loads CSS from external file specified in project config
+
+Template Features:
+- Placeholder replacement system for dynamic content injection
+- Error handling with graceful fallback to default template
+- Validation of template format and required components
+- Support for CSS imports and external resource references
+
+Security Considerations:
+- HTML escaping for all user content to prevent XSS attacks
+- Safe CSS injection with validation and sanitization
+- Controlled JavaScript execution with CSP-compatible code
+- Input validation for all template and content parameters
+
+Performance Optimization:
+- Minimized CSS with efficient selector strategies
+- Optimized JavaScript with minimal DOM manipulation
+- Efficient HTML structure with semantic elements
+- Compressed inline resources for faster loading
+
+Integration Interfaces:
+- Compatible with project configuration system for custom templates
+- Designed for integration with parsing module output format
+- Extensible architecture for additional interactive features
+- API-compatible with existing workflow systems
+
+Error Handling Strategy:
+- Graceful degradation when custom templates are unavailable
+- Comprehensive validation of input data structures
+- Fallback mechanisms for missing or corrupted template files
+- Detailed error reporting for debugging and troubleshooting
+
+Example Usage:
+```python
+# Basic usage with default template
+html_content = GenerateHTML(classified_parts, "My Requirements")
+
+# Advanced usage with custom template
+project_config = ProjectConfig("project.json")
+html_content = GenerateHTML(classified_parts, "My Requirements", project_config)
+```
+
+Output HTML Structure:
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requirement Document</title>
+    <style>/* Embedded CSS styles */</style>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">/* Interactive controls */</div>
+        <div class="title">/* Document title */</div>
+        <div class="requirement collapsible">/* Requirement content */</div>
+        /* Additional elements... */
+    </div>
+    <script>/* Interactive JavaScript */</script>
+</body>
+</html>
+```
 
 Author: Attila Gallai <attila@tux-net.hu>
-Created: 2025
+Created: 2025-07-09
+Version: 1.0.0
 License: MIT License (see LICENSE.txt)
 """
 
