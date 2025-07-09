@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requirement Document for Requirement Editor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .title {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        .subtitle {
+            color: #34495e;
+            font-weight: bold;
+            margin: 8px 0 2px 0;
+            padding: 8px 12px;
+            background-color: #ecf0f1;
+            border-left: 4px solid #3498db;
+            font-size: 1.2em;
+        }
+        .requirement {
+            background-color: #e8f5e8;
+            border-left: 4px solid #27ae60;
+            padding: 10px 15px;
+            margin: 2px 0;
+            border-radius: 4px;
+        }
+        .comment {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin: 2px 0;
+            border-radius: 4px;
+            font-style: italic;
+        }
+        .unknown {
+            background-color: #f8f9fa;
+            border-left: 4px solid #6c757d;
+            padding: 10px 15px;
+            margin: 8px 0;
+            border-radius: 4px;
+        }
+        .req-id {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-right: 10px;
+        }
+        .indent-0 { margin-left: 0px; }
+        .indent-1 { margin-left: 30px; }
+        .indent-2 { margin-left: 60px; }
+        .indent-3 { margin-left: 90px; }
+        .indent-4 { margin-left: 120px; }
+        .indent-5 { margin-left: 150px; }
+        .indent-6 { margin-left: 180px; }
+        .indent-7 { margin-left: 210px; }
+        .indent-8 { margin-left: 240px; }
+        .indent-9 { margin-left: 270px; }
+        .indent-10 { margin-left: 300px; }
+        .line-number {
+            color: #95a5a6;
+            font-size: 0.8em;
+            margin-right: 10px;
+            transition: opacity 0.3s ease;
+        }
+        .line-number.hidden {
+            display: none;
+        }
+        .collapsible {
+            position: relative;
+            cursor: pointer;
+        }
+        .collapsible::before {
+            content: "▼";
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8em;
+            color: #3498db;
+            transition: transform 0.3s ease;
+        }
+        .collapsible.collapsed::before {
+            transform: translateY(-50%) rotate(-90deg);
+        }
+        .collapsible-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .collapsible-content.collapsed {
+            max-height: 0;
+            margin: 0;
+            padding: 0;
+        }
+        .collapsible-content.expanded {
+            max-height: 1000px;
+        }
+        .has-children {
+            margin-left: 20px;
+        }
+        
+        /* Hide control buttons during print */
+        @media print {
+            .controls {
+                display: none !important;
+            }
+            
+            /* Force background colors to print */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            /* Ensure all element backgrounds are preserved */
+            .subtitle {
+                background-color: #ecf0f1 !important;
+                border-left: 4px solid #3498db !important;
+            }
+            
+            .requirement {
+                background-color: #e8f5e8 !important;
+                border-left: 4px solid #27ae60 !important;
+            }
+            
+            .comment {
+                background-color: #fff3cd !important;
+                border-left: 4px solid #ffc107 !important;
+            }
+            
+            .unknown {
+                background-color: #f8f9fa !important;
+                border-left: 4px solid #6c757d !important;
+            }
+            
+            .title {
+                border-bottom: 3px solid #3498db !important;
+            }
+            
+            /* Optional: Adjust other print-specific styles */
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                margin: 0;
+                padding: 10px;
+                background-color: white !important;
+            }
+            
+            body {
+                margin: 0;
+                background-color: white !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title indent-0">
+            <span class="line-number">[1]</span>Requirement document for Requirement Editor
+        </div>
+        <div class="comment indent-1 " onclick="toggleCollapse(this)">
+            <span class="line-number">[2]</span><span class="req-id">1030 Comm:</span>This project is for providiing application to writing requirement documents. The requirements has a document level title and sub sections with sub titles. A requirement documentum is a list of classified requirements, that shall be testable and implementable clearly. The document contain comments to give more information to make clear thinks.
+        </div>
+        <div class="subtitle indent-1 collapsible" onclick="toggleCollapse(this)">
+            <span class="line-number">[3]</span>Requirement representation in data
+        </div>
+        <div class="collapsible-content expanded" id="content-3">
+        <div class="requirement indent-2 collapsible" onclick="toggleCollapse(this)">
+            <span class="line-number">[4]</span><span class="req-id">1000 Req:</span>The requirements shall be saved in data structure, that represents the hierarchy of the requirements.
+        </div>
+        <div class="collapsible-content expanded" id="content-4">
+        <div class="requirement indent-4 collapsible" onclick="toggleCollapse(this)">
+            <span class="line-number">[5]</span><span class="req-id">1001 Req:</span>Every requirement item shall be built from the following items: ID, Type: [TITLE, SUBTITLE, REQUIREMENT, COMMENT], Description, Implemented [TRUE, FALSE], Tested [TRUE, FALSE], Version [M.m], Baselined [integer], Deleted [TRUE, FALSE].
+        </div>
+        <div class="collapsible-content expanded" id="content-5">
+        <div class="requirement indent-6 " onclick="toggleCollapse(this)">
+            <span class="line-number">[6]</span><span class="req-id">1002 Req:</span>The ID shall be a unique integer. Once an ID has been assigned and the item is later removed, that ID shall never be reused.
+        </div>
+        <div class="requirement indent-6 " onclick="toggleCollapse(this)">
+            <span class="line-number">[7]</span><span class="req-id">1003 Req:</span>The type shall be one of the following unique enum values: [TITLE, SUBTITLE, REQUIREMENT, COMMENT].
+        </div>
+        <div class="requirement indent-6 " onclick="toggleCollapse(this)">
+            <span class="line-number">[8]</span><span class="req-id">1004 Req:</span>The description itself shall be a well-worded, easy to understand, not sophisticated high-level sentence or sentences that form a requirement or a comment.
+        </div>
+        <div class="requirement indent-6 " onclick="toggleCollapse(this)">
+            <span class="line-number">[9]</span><span class="req-id">1005 Req:</span>The &quot;Implemented&quot; field shall indicate whether the requirement has been implemented, and shall store a boolean value: [TRUE, FALSE].
+        </div>
+        <div class="requirement indent-6 collapsible" onclick="toggleCollapse(this)">
+            <span class="line-number">[10]</span><span class="req-id">1006 Req:</span>The &quot;Tested&quot; field shall indicate whether the requirement has been tested, and shall store a boolean value: [TRUE, FALSE].
+        </div>
+        <div class="collapsible-content expanded" id="content-10">
+        <div class="comment indent-8 " onclick="toggleCollapse(this)">
+            <span class="line-number">[11]</span><span class="req-id">1009 Comm:</span>Testing means the requirement has been validated through an appropriate process such as manual verification, automated test execution, or review to ensure it behaves as expected and fulfills its purpose.
+        </div>
+        </div>
+        <div class="requirement indent-6 collapsible" onclick="toggleCollapse(this)">
+            <span class="line-number">[12]</span><span class="req-id">1007 Req:</span>The &quot;Version&quot; field shall store the version number in the format M.m, where M is the major version and m is the minor version. These numbers shall be positive integers.
+        </div>
+        <div class="collapsible-content expanded" id="content-12">
+        <div class="comment indent-8 " onclick="toggleCollapse(this)">
+            <span class="line-number">[13]</span><span class="req-id">1008 Comm:</span>Examples — 1.0, 2.5, 3.12, 10.1 are valid version numbers. Values like 0.-1, 2.a, or 1.1.1 are invalid.
+        </div>
+        </div>
+        <div class="requirement indent-6 collapsible" onclick="toggleCollapse(this)">
+            <span class="line-number">[14]</span><span class="req-id">1012 Req:</span>The &quot;Baselined&quot; field shall be a positive integer between 0 and INTMAX.
+        </div>
+        <div class="collapsible-content expanded" id="content-14">
+        <div class="comment indent-8 " onclick="toggleCollapse(this)">
+            <span class="line-number">[15]</span><span class="req-id">1013 Comm:</span>The baseline means a set of requirements at a specific point in the project&#39;s lifetime. When a baseline is created, all requirements with a &quot;false&quot; deleted flag and the highest version number are duplicated with the new baseline number recorded in each copy. It means the document can have more than one baseline, and it is possible to make differences between them or print them out as separate documents.
+        </div>
+        </div>
+        <div class="requirement indent-6 " onclick="toggleCollapse(this)">
+            <span class="line-number">[16]</span><span class="req-id">1014 Req:</span>The &quot;Deleted&quot; field shall indicate whether a requirement is logically deleted. A deleted item shall remain in the database, shall be ignored during baseline creation and in the active view, but shall be available for review if needed.
+        </div>
+        </div>
+        </div>
+        <div class="requirement indent-2 collapsible" onclick="toggleCollapse(this)">
+            <span class="line-number">[17]</span><span class="req-id">1010 Req:</span>Every document shall be saved into a database (type is not defined at the moment).
+        </div>
+        <div class="collapsible-content expanded" id="content-17">
+        <div class="comment indent-4 " onclick="toggleCollapse(this)">
+            <span class="line-number">[18]</span><span class="req-id">1011 Comm:</span>The database can be SQLite or any kind of Python structure saved in a file in a form it can be reloaded easily.
+        </div>
+        </div>
+        </div>
+        <div class="subtitle indent-1 collapsible" onclick="toggleCollapse(this)">
+            <span class="line-number">[20]</span>User Interface Requirements
+        </div>
+        <div class="collapsible-content expanded" id="content-20">
+        <div class="requirement indent-2 collapsible" onclick="toggleCollapse(this)">
+            <span class="line-number">[21]</span><span class="req-id">1020 Req:</span>The application shall provide a user interface that allows hierarchical editing of requirement items.
+        </div>
+        <div class="collapsible-content expanded" id="content-21">
+        <div class="requirement indent-4 " onclick="toggleCollapse(this)">
+            <span class="line-number">[22]</span><span class="req-id">1021 Req:</span>The UI shall allow users to create, edit, delete, and reorder requirements using drag-and-drop functionality.
+        </div>
+        <div class="requirement indent-4 " onclick="toggleCollapse(this)">
+            <span class="line-number">[23]</span><span class="req-id">1022 Req:</span>The UI shall visually distinguish between requirement types using icons or formatting.
+        </div>
+        <div class="requirement indent-4 " onclick="toggleCollapse(this)">
+            <span class="line-number">[24]</span><span class="req-id">1023 Req:</span>The UI shall allow filtering by Implemented, Tested, and Baselined status.
+        </div>
+        <div class="requirement indent-4 " onclick="toggleCollapse(this)">
+            <span class="line-number">[25]</span><span class="req-id">1024 Req:</span>The UI shall support export and import of the document in HTML and Markdown format.
+        </div>
+        <div class="requirement indent-4 " onclick="toggleCollapse(this)">
+            <span class="line-number">[26]</span><span class="req-id">1025 Req:</span>The UI shall support baseline version comparison and difference highlighting.
+        </div>
+        </div>
+        </div>
+    </div>
+    
+    <script>
+        function toggleCollapse(element) {
+            if (!element.classList.contains('collapsible')) {
+                return;
+            }
+            
+            const isCollapsed = element.classList.contains('collapsed');
+            const lineNumber = element.querySelector('.line-number').textContent.match(/\[(\d+)\]/)[1];
+            const contentDiv = document.getElementById('content-' + lineNumber);
+            
+            if (isCollapsed) {
+                // Expand
+                element.classList.remove('collapsed');
+                if (contentDiv) {
+                    contentDiv.classList.remove('collapsed');
+                    contentDiv.classList.add('expanded');
+                }
+            } else {
+                // Collapse
+                element.classList.add('collapsed');
+                if (contentDiv) {
+                    contentDiv.classList.remove('expanded');
+                    contentDiv.classList.add('collapsed');
+                }
+            }
+        }
+        
+        // Function to collapse all elements
+        function collapseAll() {
+            const collapsibles = document.querySelectorAll('.collapsible');
+            collapsibles.forEach(element => {
+                element.classList.add('collapsed');
+                const lineNumber = element.querySelector('.line-number').textContent.match(/\[(\d+)\]/)[1];
+                const contentDiv = document.getElementById('content-' + lineNumber);
+                if (contentDiv) {
+                    contentDiv.classList.remove('expanded');
+                    contentDiv.classList.add('collapsed');
+                }
+            });
+        }
+        
+        // Function to expand all elements
+        function expandAll() {
+            const collapsibles = document.querySelectorAll('.collapsible');
+            collapsibles.forEach(element => {
+                element.classList.remove('collapsed');
+                const lineNumber = element.querySelector('.line-number').textContent.match(/\[(\d+)\]/)[1];
+                const contentDiv = document.getElementById('content-' + lineNumber);
+                if (contentDiv) {
+                    contentDiv.classList.remove('collapsed');
+                    contentDiv.classList.add('expanded');
+                }
+            });
+        }
+        
+        // Function to toggle line numbers visibility
+        function toggleLineNumbers() {
+            const lineNumbers = document.querySelectorAll('.line-number');
+            const toggleButton = document.getElementById('toggle-line-numbers');
+            
+            lineNumbers.forEach(lineNumber => {
+                lineNumber.classList.toggle('hidden');
+            });
+            
+            // Update button text
+            const isHidden = lineNumbers[0].classList.contains('hidden');
+            toggleButton.textContent = isHidden ? 'Show Line Numbers' : 'Hide Line Numbers';
+        }
+        
+        // Function to print as PDF
+        function printToPDF() {
+            window.print();
+        }
+        
+        // Function to print document as PDF
+        function printToPDF() {
+            window.print();
+        }
+        
+        // Add control buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.container');
+            const controls = document.createElement('div');
+            controls.className = 'controls';
+            controls.innerHTML = `
+                <div style="margin-bottom: 20px; text-align: right;">
+                    <button onclick="expandAll()" style="margin-right: 10px; padding: 5px 10px; background: #3498db; color: white; border: none; border-radius: 3px; cursor: pointer;">Expand All</button>
+                    <button onclick="collapseAll()" style="margin-right: 10px; padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer;">Collapse All</button>
+                    <button id="toggle-line-numbers" onclick="toggleLineNumbers()" style="margin-right: 10px; padding: 5px 10px; background: #9b59b6; color: white; border: none; border-radius: 3px; cursor: pointer;">Hide Line Numbers</button>
+                    <button onclick="printToPDF()" style="padding: 5px 10px; background: #2ecc71; color: white; border: none; border-radius: 3px; cursor: pointer;">Print as PDF</button>
+                </div>
+            `;
+            container.insertBefore(controls, container.firstChild);
+        });
+    </script>
+</body>
+</html>

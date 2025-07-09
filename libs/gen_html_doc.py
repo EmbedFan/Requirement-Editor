@@ -1,0 +1,542 @@
+"""
+HTML Document Generation Module for Requirement Documents
+
+This module provides comprehensive HTML generation functionality for converting
+classified requirement document elements into interactive, styled web documents.
+
+Key Capabilities:
+- Generates complete HTML documents with embedded CSS and JavaScript
+- Creates hierarchical visual representation of document structure
+- Implements interactive expand/collapse functionality for document sections
+- Provides modern, responsive web design with professional styling
+- Ensures print-friendly output with preserved background colors
+- Includes control interface for document manipulation
+
+HTML Document Features:
+- Embedded CSS for complete styling (no external dependencies)
+- JavaScript for interactive functionality (expand/collapse, line number toggle)
+- Print media queries to optimize PDF generation
+- Responsive design that works on various screen sizes
+- Color-coded element types for visual distinction
+- Smooth animations and transitions for better user experience
+
+Element Type Styling:
+- TITLE: Large headers with blue underline (highest visual prominence)
+- SUBTITLE: Bold section headers with gray background and blue left border
+- REQUIREMENT: Green-accented boxes with clear requirement identification
+- COMMENT: Yellow-accented boxes with italic text for comments
+- UNKNOWN: Gray-accented boxes for unrecognized content
+
+Interactive Features:
+- Click-to-expand/collapse for all elements except titles
+- "Expand All" and "Collapse All" buttons for bulk operations
+- Line number toggle for reference/clean view switching
+- "Print to PDF" button for document export
+- All controls automatically hidden during printing
+
+Technical Implementation:
+- Uses CSS flexbox and modern web standards
+- Implements CSS variables for consistent theming
+- JavaScript uses modern DOM manipulation techniques
+- Print styles use CSS @media queries for automatic switching
+- HTML escaping prevents XSS vulnerabilities
+- Semantic HTML structure for accessibility
+
+Dependencies:
+    None - All functionality is self-contained in generated HTML
+
+Author: Attila Gallai <attila@tux-net.hu>
+Created: 2025
+License: MIT License (see LICENSE.txt)
+"""
+
+def GenerateHTML(classified_parts, title="Requirement Document"):
+    """
+    Generate a complete interactive HTML document from classified markdown parts.
+    
+    Creates a styled, hierarchical HTML document with the following features:
+    - Collapsible/expandable sections (except titles)
+    - Visual distinction for different element types (requirements, comments, subtitles)
+    - Interactive control buttons (expand/collapse all, toggle line numbers, print to PDF)
+    - Print-friendly styling with preserved background colors
+    - Responsive design with modern CSS styling
+    
+    Args:
+        classified_parts (list): List of dictionaries containing classified parts from ClassifyParts function.
+                                Each dictionary should contain:
+                                - line_number: Original line number in source file
+                                - type: Element type ('TITLE', 'SUBTITLE', 'REQUIREMENT', 'COMMENT', 'UNKNOWN')
+                                - indent: Indentation level (0, 1, 2, etc.)
+                                - id: Requirement/Comment ID number (if applicable)
+                                - description: Processed description text
+                                - children_refs: List of direct references to child elements
+        title (str, optional): Title for the HTML document. Defaults to "Requirement Document".
+        
+    Returns:
+        str: Complete HTML document as a string with embedded CSS and JavaScript for interactivity.
+             Returns a simple error message HTML if no classified_parts provided.
+             
+    Note:
+        The generated HTML includes:
+        - CSS for visual styling and print optimization
+        - JavaScript for interactive functionality
+        - Control buttons that are hidden during printing
+        - Color-coded backgrounds for different element types
+    """
+    if not classified_parts:
+        return "<html><body><h1>No content to display</h1></body></html>"
+    
+    # HTML document structure
+    html_content = []
+    
+    # HTML header with CSS styling
+    html_content.append('''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>''' + title + '''</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .title {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        .subtitle {
+            color: #34495e;
+            font-weight: bold;
+            margin: 8px 0 2px 0;
+            padding: 8px 12px;
+            background-color: #ecf0f1;
+            border-left: 4px solid #3498db;
+            font-size: 1.2em;
+        }
+        .requirement {
+            background-color: #e8f5e8;
+            border-left: 4px solid #27ae60;
+            padding: 10px 15px;
+            margin: 2px 0;
+            border-radius: 4px;
+        }
+        .comment {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin: 2px 0;
+            border-radius: 4px;
+            font-style: italic;
+        }
+        .unknown {
+            background-color: #f8f9fa;
+            border-left: 4px solid #6c757d;
+            padding: 10px 15px;
+            margin: 8px 0;
+            border-radius: 4px;
+        }
+        .req-id {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-right: 10px;
+        }
+        .indent-0 { margin-left: 0px; }
+        .indent-1 { margin-left: 30px; }
+        .indent-2 { margin-left: 60px; }
+        .indent-3 { margin-left: 90px; }
+        .indent-4 { margin-left: 120px; }
+        .indent-5 { margin-left: 150px; }
+        .indent-6 { margin-left: 180px; }
+        .indent-7 { margin-left: 210px; }
+        .indent-8 { margin-left: 240px; }
+        .indent-9 { margin-left: 270px; }
+        .indent-10 { margin-left: 300px; }
+        .line-number {
+            color: #95a5a6;
+            font-size: 0.8em;
+            margin-right: 10px;
+            transition: opacity 0.3s ease;
+        }
+        .line-number.hidden {
+            display: none;
+        }
+        .collapsible {
+            position: relative;
+            cursor: pointer;
+        }
+        .collapsible::before {
+            content: "▼";
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8em;
+            color: #3498db;
+            transition: transform 0.3s ease;
+        }
+        .collapsible.collapsed::before {
+            transform: translateY(-50%) rotate(-90deg);
+        }
+        .collapsible-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .collapsible-content.collapsed {
+            max-height: 0;
+            margin: 0;
+            padding: 0;
+        }
+        .collapsible-content.expanded {
+            max-height: 1000px;
+        }
+        .has-children {
+            margin-left: 20px;
+        }
+        
+        /* Hide control buttons during print */
+        @media print {
+            .controls {
+                display: none !important;
+            }
+            
+            /* Force background colors to print */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            /* Ensure all element backgrounds are preserved */
+            .subtitle {
+                background-color: #ecf0f1 !important;
+                border-left: 4px solid #3498db !important;
+            }
+            
+            .requirement {
+                background-color: #e8f5e8 !important;
+                border-left: 4px solid #27ae60 !important;
+            }
+            
+            .comment {
+                background-color: #fff3cd !important;
+                border-left: 4px solid #ffc107 !important;
+            }
+            
+            .unknown {
+                background-color: #f8f9fa !important;
+                border-left: 4px solid #6c757d !important;
+            }
+            
+            .title {
+                border-bottom: 3px solid #3498db !important;
+            }
+            
+            /* Optional: Adjust other print-specific styles */
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                margin: 0;
+                padding: 10px;
+                background-color: white !important;
+            }
+            
+            body {
+                margin: 0;
+                background-color: white !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">''')
+    
+    # Generate hierarchical content
+    html_content.append(_generate_hierarchical_content(classified_parts))
+    
+    # Close HTML document
+    html_content.append('''
+    </div>
+    
+    <script>
+        function toggleCollapse(element) {
+            if (!element.classList.contains('collapsible')) {
+                return;
+            }
+            
+            const isCollapsed = element.classList.contains('collapsed');
+            const lineNumber = element.querySelector('.line-number').textContent.match(/\[(\d+)\]/)[1];
+            const contentDiv = document.getElementById('content-' + lineNumber);
+            
+            if (isCollapsed) {
+                // Expand
+                element.classList.remove('collapsed');
+                if (contentDiv) {
+                    contentDiv.classList.remove('collapsed');
+                    contentDiv.classList.add('expanded');
+                }
+            } else {
+                // Collapse
+                element.classList.add('collapsed');
+                if (contentDiv) {
+                    contentDiv.classList.remove('expanded');
+                    contentDiv.classList.add('collapsed');
+                }
+            }
+        }
+        
+        // Function to collapse all elements
+        function collapseAll() {
+            const collapsibles = document.querySelectorAll('.collapsible');
+            collapsibles.forEach(element => {
+                element.classList.add('collapsed');
+                const lineNumber = element.querySelector('.line-number').textContent.match(/\[(\d+)\]/)[1];
+                const contentDiv = document.getElementById('content-' + lineNumber);
+                if (contentDiv) {
+                    contentDiv.classList.remove('expanded');
+                    contentDiv.classList.add('collapsed');
+                }
+            });
+        }
+        
+        // Function to expand all elements
+        function expandAll() {
+            const collapsibles = document.querySelectorAll('.collapsible');
+            collapsibles.forEach(element => {
+                element.classList.remove('collapsed');
+                const lineNumber = element.querySelector('.line-number').textContent.match(/\[(\d+)\]/)[1];
+                const contentDiv = document.getElementById('content-' + lineNumber);
+                if (contentDiv) {
+                    contentDiv.classList.remove('collapsed');
+                    contentDiv.classList.add('expanded');
+                }
+            });
+        }
+        
+        // Function to toggle line numbers visibility
+        function toggleLineNumbers() {
+            const lineNumbers = document.querySelectorAll('.line-number');
+            const toggleButton = document.getElementById('toggle-line-numbers');
+            
+            lineNumbers.forEach(lineNumber => {
+                lineNumber.classList.toggle('hidden');
+            });
+            
+            // Update button text
+            const isHidden = lineNumbers[0].classList.contains('hidden');
+            toggleButton.textContent = isHidden ? 'Show Line Numbers' : 'Hide Line Numbers';
+        }
+        
+        // Function to print as PDF
+        function printToPDF() {
+            window.print();
+        }
+        
+        // Function to print document as PDF
+        function printToPDF() {
+            window.print();
+        }
+        
+        // Add control buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.container');
+            const controls = document.createElement('div');
+            controls.className = 'controls';
+            controls.innerHTML = `
+                <div style="margin-bottom: 20px; text-align: right;">
+                    <button onclick="expandAll()" style="margin-right: 10px; padding: 5px 10px; background: #3498db; color: white; border: none; border-radius: 3px; cursor: pointer;">Expand All</button>
+                    <button onclick="collapseAll()" style="margin-right: 10px; padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer;">Collapse All</button>
+                    <button id="toggle-line-numbers" onclick="toggleLineNumbers()" style="margin-right: 10px; padding: 5px 10px; background: #9b59b6; color: white; border: none; border-radius: 3px; cursor: pointer;">Hide Line Numbers</button>
+                    <button onclick="printToPDF()" style="padding: 5px 10px; background: #2ecc71; color: white; border: none; border-radius: 3px; cursor: pointer;">Print as PDF</button>
+                </div>
+            `;
+            container.insertBefore(controls, container.firstChild);
+        });
+    </script>
+</body>
+</html>''')
+    
+    return ''.join(html_content)
+
+
+def _generate_hierarchical_content(classified_parts):
+    """
+    Generate hierarchical HTML content with proper parent-child nesting for collapsible elements.
+    
+    This function processes the classified parts and generates HTML content that respects
+    the hierarchical structure defined by parent-child relationships. Only root elements
+    (those without parents) are processed directly, as child elements are handled
+    recursively by their parents.
+    
+    Args:
+        classified_parts (list): List of classified part dictionaries containing hierarchical structure.
+                                Each part should have 'parent' and 'children_refs' attributes.
+        
+    Returns:
+        str: HTML content string with proper hierarchical nesting. Returns empty string
+             if no classified_parts provided.
+             
+    Note:
+        This function identifies root elements (parts with parent=None) and delegates
+        the recursive HTML generation to _generate_element_html() for each root element.
+    """
+    if not classified_parts:
+        return ""
+    
+    content = []
+    
+    # Find root elements (those without parents)
+    root_elements = [part for part in classified_parts if part['parent'] is None]
+    
+    for root in root_elements:
+        content.append(_generate_element_html(root))
+    
+    return ''.join(content)
+
+
+def _generate_element_html(part):
+    """
+    Generate HTML representation for a single element and recursively process its children.
+    
+    Creates HTML div elements with appropriate CSS classes and styling based on the element type.
+    Handles the following element types with distinct visual styling:
+    - TITLE: Large header with blue underline (not collapsible)
+    - SUBTITLE: Bold section header with gray background (collapsible if has children)
+    - REQUIREMENT: Green-accented box with requirement ID (collapsible if has children)
+    - COMMENT: Yellow-accented box with comment ID in italics (collapsible if has children)
+    - UNKNOWN: Gray-accented box for unrecognized content (collapsible if has children)
+    
+    Args:
+        part (dict): Part dictionary containing element information with the following keys:
+                    - line_number: Original line number for cross-referencing
+                    - type: Element type string ('TITLE', 'SUBTITLE', 'REQUIREMENT', 'COMMENT', 'UNKNOWN')
+                    - indent: Indentation level (0-10, capped at 10 for CSS classes)
+                    - id: Requirement/Comment ID number (optional, for REQUIREMENT/COMMENT types)
+                    - description: Text content to display
+                    - children_refs: List of child elements for recursive processing
+        
+    Returns:
+        str: HTML content string for the element and all its children. Includes:
+             - Proper CSS classes for styling and indentation
+             - Line number span for reference
+             - Collapsible containers for child elements (except for TITLE elements)
+             - Recursive HTML for all child elements
+             
+    Note:
+        - TITLE elements render children directly without collapsible containers
+        - All other element types wrap children in collapsible containers with expand/collapse functionality
+        - HTML content is properly escaped to prevent XSS vulnerabilities
+        - Indentation is handled via CSS classes (indent-0 through indent-10)
+    """
+    indent_class = f"indent-{min(part['indent'], 10)}"
+    line_info = f'<span class="line-number">[{part["line_number"]}]</span>'
+    has_children = len(part['children']) > 0
+    
+    # Title elements are not collapsible, others are if they have children
+    collapsible_class = "collapsible" if has_children and part['type'] != 'TITLE' else ""
+    
+    # Generate element HTML based on type
+    if part['type'] == 'TITLE':
+        element_html = f'''
+        <div class="title {indent_class}">
+            {line_info}{_escape_html(part["description"])}
+        </div>'''
+        
+    elif part['type'] == 'SUBTITLE':
+        element_html = f'''
+        <div class="subtitle {indent_class} {collapsible_class}" onclick="toggleCollapse(this)">
+            {line_info}{_escape_html(part["description"])}
+        </div>'''
+        
+    elif part['type'] == 'REQUIREMENT':
+        req_id = f'<span class="req-id">{part["id"]} Req:</span>' if part['id'] else ''
+        element_html = f'''
+        <div class="requirement {indent_class} {collapsible_class}" onclick="toggleCollapse(this)">
+            {line_info}{req_id}{_escape_html(part["description"])}
+        </div>'''
+        
+    elif part['type'] == 'COMMENT':
+        comment_id = f'<span class="req-id">{part["id"]} Comm:</span>' if part['id'] else ''
+        element_html = f'''
+        <div class="comment {indent_class} {collapsible_class}" onclick="toggleCollapse(this)">
+            {line_info}{comment_id}{_escape_html(part["description"])}
+        </div>'''
+        
+    else:  # UNKNOWN
+        element_html = f'''
+        <div class="unknown {indent_class} {collapsible_class}" onclick="toggleCollapse(this)">
+            {line_info}{_escape_html(part["description"])}
+        </div>'''
+    
+    # Add children if they exist
+    if has_children:
+        if part['type'] == 'TITLE':
+            # For titles, don't wrap children in collapsible container
+            for child_ref in part['children_refs']:
+                element_html += _generate_element_html(child_ref)
+        else:
+            # For other elements, wrap children in collapsible container
+            element_html += f'''
+        <div class="collapsible-content expanded" id="content-{part['line_number']}">'''
+            
+            # Recursively generate children HTML
+            for child_ref in part['children_refs']:
+                element_html += _generate_element_html(child_ref)
+            
+            element_html += '''
+        </div>'''
+    
+    return element_html
+
+
+def _escape_html(text):
+    """
+    Escape HTML special characters in text to prevent XSS attacks and ensure proper display.
+    
+    Converts potentially dangerous HTML characters to their corresponding HTML entities
+    to ensure safe rendering in web browsers and prevent cross-site scripting (XSS)
+    vulnerabilities.
+    
+    Args:
+        text (str): Raw text string that may contain HTML special characters.
+                   Can be None or empty string.
+        
+    Returns:
+        str: HTML-safe string with special characters converted to HTML entities.
+             Returns empty string if input text is None or empty.
+             
+    Character Conversions:
+        & -> &amp;   (must be first to avoid double-escaping)
+        < -> &lt;    (less than)
+        > -> &gt;    (greater than)
+        " -> &quot;  (double quote)
+        ' -> &#39;   (single quote/apostrophe)
+        
+    Note:
+        This function is essential for security when displaying user-generated
+        content or content from external sources in HTML documents.
+    """
+    if not text:
+        return ""
+    
+    # Basic HTML escaping
+    text = text.replace('&', '&amp;')
+    text = text.replace('<', '&lt;')
+    text = text.replace('>', '&gt;')
+    text = text.replace('"', '&quot;')
+    text = text.replace("'", '&#39;')
+    
+    return text
