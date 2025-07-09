@@ -12,6 +12,7 @@ Key Features:
 - Handles application version tracking for compatibility
 - Provides comprehensive error handling for file operations
 - Supports project configuration validation and migration
+- Enforces configuration file creation in working directory for proper organization
 
 Configuration Data Structure:
 - input_md_file_path: Path to the source markdown requirements document
@@ -26,6 +27,12 @@ JSON Schema:
     "project_last_modification_date": "2025-07-09 15:20",
     "application_version": "1.0.0"
 }
+
+Working Directory Policy:
+All project configuration files are created in the current working directory to ensure
+proper project organization and prevent configuration files from being scattered across
+the filesystem. Convenience functions automatically generate appropriate filenames and
+enforce this policy.
 
 Author: Attila Gallai <attila@tux-net.hu>
 Created: 2025
@@ -327,27 +334,47 @@ class ProjectConfig:
         print("=" * 60)
 
 
-def create_project_config(config_file_path: str, input_md_file_path: str) -> Optional[ProjectConfig]:
+def create_project_config(input_md_file_path: str, project_name: str = None) -> Optional[ProjectConfig]:
     """
     Convenience function to create a new project configuration.
     
     Creates a new ProjectConfig instance and initializes it with the specified
-    input markdown file path. Handles the complete creation process.
+    input markdown file path. The configuration file is always saved to the 
+    current working directory to ensure proper project organization.
     
     Args:
-        config_file_path (str): Path where the project configuration JSON will be saved.
         input_md_file_path (str): Path to the source markdown requirements file.
+        project_name (str, optional): Name for the project configuration file.
+                                     If not provided, uses the input markdown filename.
     
     Returns:
         ProjectConfig: Configured ProjectConfig instance if successful.
         None: If creation failed due to errors.
         
+    Side Effects:
+        - Creates project configuration JSON file in current working directory
+        - File name format: "{project_name}_config.json" or "{md_filename}_config.json"
+        
     Example:
-        >>> project = create_project_config("project.json", "requirements.md")
+        >>> # Creates "requirements_config.json" in current directory
+        >>> project = create_project_config("requirements.md")
         >>> if project:
         ...     project.print_project_info()
+        >>>
+        >>> # Creates "myproject_config.json" in current directory  
+        >>> project = create_project_config("requirements.md", "myproject")
     """
     try:
+        # Generate project name from input file if not provided
+        if project_name is None:
+            # Extract filename without extension from input path
+            input_filename = os.path.splitext(os.path.basename(input_md_file_path))[0]
+            project_name = input_filename
+        
+        # Create config file name and ensure it's in current working directory
+        config_filename = f"{project_name}_config.json"
+        config_file_path = os.path.join(os.getcwd(), config_filename)
+        
         project = ProjectConfig(config_file_path)
         if project.create_new_project(input_md_file_path):
             return project
@@ -386,4 +413,54 @@ def load_project_config(config_file_path: str) -> Optional[ProjectConfig]:
             return None
     except Exception as e:
         print(f"Error loading project configuration: {e}")
+        return None
+
+
+def create_project_config_with_filename(input_md_file_path: str, config_filename: str) -> Optional[ProjectConfig]:
+    """
+    Convenience function to create a new project configuration with specified filename.
+    
+    Creates a new ProjectConfig instance with a custom configuration filename.
+    The configuration file is always saved to the current working directory 
+    regardless of any path components in the filename parameter.
+    
+    Args:
+        input_md_file_path (str): Path to the source markdown requirements file.
+        config_filename (str): Desired name for the configuration file.
+                              Path components are ignored - only filename is used.
+    
+    Returns:
+        ProjectConfig: Configured ProjectConfig instance if successful.
+        None: If creation failed due to errors.
+        
+    Side Effects:
+        - Creates project configuration JSON file in current working directory
+        - Strips any path components from config_filename for security
+        
+    Example:
+        >>> # Creates "my_project.json" in current directory
+        >>> project = create_project_config_with_filename("requirements.md", "my_project.json")
+        >>> 
+        >>> # Path components are ignored - still creates in current directory
+        >>> project = create_project_config_with_filename("requirements.md", "/tmp/config.json")
+        >>> # Above creates "config.json" in current working directory, not /tmp/
+    """
+    try:
+        # Extract just the filename, ignore any path components for security
+        safe_filename = os.path.basename(config_filename)
+        
+        # Ensure .json extension
+        if not safe_filename.endswith('.json'):
+            safe_filename += '.json'
+        
+        # Create config file path in current working directory
+        config_file_path = os.path.join(os.getcwd(), safe_filename)
+        
+        project = ProjectConfig(config_file_path)
+        if project.create_new_project(input_md_file_path):
+            return project
+        else:
+            return None
+    except Exception as e:
+        print(f"Error creating project configuration: {e}")
         return None

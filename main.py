@@ -43,7 +43,7 @@ License: MIT License (see LICENSE.txt)
 from libs.parse_req_md import ReadMDFile, ClassifyParts
 from libs.gen_html_doc import GenerateHTML
 
-cfg_inputfile = "C:\\Munka\\Sandbox\\PromptEnginering\\Requirement Editor\\python\\testfiles\\test_input.md"
+cfg_inputfile = "C:\\Munka\\Sandbox\\PromptEnginering\\Requirement Editor\\python\\test\\data\\test_input.md"
 
 
 def SaveHTMLFile(html_content, filename):

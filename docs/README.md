@@ -1,6 +1,6 @@
 # Requirement Editor Documentation
 
-[← Back to Main README](../README.md) | [🔧 Main Module](main.md) | [🔍 Parsing Module](parse_req_md.md) | [🎨 HTML Generation](gen_html_doc.md)
+[← Back to Main README](../README.md) | [🔧 Main Module](main.md) | [🔍 Parsing Module](parse_req_md.md) | [🎨 HTML Generation](gen_html_doc.md) | [📁 Project Config](project.md)
 
 ---
 
@@ -10,7 +10,7 @@ The Requirement Editor is a Python-based tool that converts markdown-formatted r
 
 **Author:** Attila Gallai <attila@tux-net.hu>  
 **Created:** 2025  
-**Last Updated:** 2025-07-09 14:40
+**Last Updated:** 2025-01-09 17:35
 
 ## Project Structure
 
@@ -19,13 +19,28 @@ python/
 ├── main.py                    # Main entry point and workflow orchestrator
 ├── libs/
 │   ├── parse_req_md.py       # Markdown parsing and classification module
-│   └── gen_html_doc.py       # HTML generation module
+│   ├── gen_html_doc.py       # HTML generation module
+│   └── project.py            # Project configuration management module
+├── test/
+│   ├── test_runner.py        # Automated test runner script
+│   ├── test_reporter.py      # HTML test report generator
+│   ├── test_project_config.py # Project configuration tests
+│   ├── test_comprehensive.py # Complete workflow tests
+│   ├── test_simple.py        # Basic functionality tests  
+│   ├── test_mixed_results.py # Mixed result demonstration tests
+│   ├── data/
+│   │   ├── test_input.md     # Sample requirement document for testing
+│   │   └── test_input.html   # Generated HTML output (created by tests)
+│   ├── results/              # Generated test reports directory
+│   │   └── test_result_*.html # Timestamped HTML test reports
+│   └── README.md             # Test directory documentation
 ├── docs/
 │   ├── README.md             # This file - project overview
 │   ├── main.md               # main.py documentation
 │   ├── parse_req_md.md       # parse_req_md.py documentation
-│   └── gen_html_doc.md       # gen_html_doc.py documentation
-└── test_input.md             # Sample requirement document
+│   ├── gen_html_doc.md       # gen_html_doc.py documentation
+│   └── project.md            # project.py documentation
+└── LICENSE                   # MIT License file
 ```
 
 ## Quick Start
@@ -34,6 +49,26 @@ python/
 2. **Configuration**: Edit `cfg_inputfile` in `main.py` to point to your markdown file
 3. **Execution**: Run `python main.py`
 4. **Output**: HTML file generated with same name as input but `.html` extension
+5. **Testing**: Run `python test/test_runner.py` to execute all tests
+
+## Testing
+
+The project includes comprehensive testing capabilities:
+
+### Running Tests
+```bash
+# Run all tests with the test runner
+python test/test_runner.py
+
+# Run individual test files
+python test/test_project_config.py
+```
+
+### Test Structure
+- **Unit Tests**: Individual module functionality testing
+- **Integration Tests**: Full workflow validation  
+- **Test Data**: Sample files in `test/data/` directory
+- **Automated Runner**: Discovers and executes all tests
 
 ## System Architecture
 
@@ -48,6 +83,10 @@ main.py (Orchestrator)
 │   └── _build_hierarchy() - Hierarchy building
 ├── libs/gen_html_doc.py (HTML Generator)
 │   └── GenerateHTML() - Interactive HTML creation
+└── libs/project.py (Configuration Manager)
+    ├── ProjectConfig class - Project metadata management
+    ├── create_project_config() - New project creation
+    └── load_project_config() - Existing project loading
 └── SaveHTMLFile() - File output handling
 ```
 
@@ -242,35 +281,34 @@ Typical performance on modern hardware:
 
 ### Testing Approach
 - **Unit Tests**: Individual function testing
-- **Integration Tests**: Full workflow verification
-- **Edge Cases**: Boundary condition testing
-- **Browser Testing**: Cross-browser compatibility verification
+- **Integration Tests**: Full workflow validation
+- **Manual Testing**: Real-world document processing
+- **Performance Tests**: Large document handling
 
-### Extension Points
-The system is designed for extensibility:
-- **New Element Types**: Add classification rules in `ClassifyParts()`
-- **Custom Styling**: Modify CSS in HTML generation
-- **Output Formats**: Create new generation modules
-- **Input Formats**: Add parsers for other markup languages
+### Contribution Guidelines
+- Follow existing code style and patterns
+- Add comprehensive documentation for new features
+- Include error handling and validation
+- Test with various document sizes and formats
 
 ## Troubleshooting
 
 ### Common Issues
 
-#### "File not found" Error
-- **Cause**: Incorrect path in `cfg_inputfile`
-- **Solution**: Verify file path and check file exists
-- **Check**: Use absolute paths to avoid directory issues
+#### File Not Found
+- **Error**: `FileNotFoundError: [Errno 2] No such file or directory`
+- **Solution**: Verify `cfg_inputfile` path in `main.py`
+- **Check**: File permissions and accessibility
 
-#### HTML Not Displaying Correctly
-- **Cause**: Browser compatibility or CSS issues
-- **Solution**: Try different browser or check console for errors
-- **Check**: Ensure generated HTML is valid
+#### Empty Output
+- **Cause**: No recognized content patterns in input
+- **Solution**: Verify markdown follows supported syntax
+- **Debug**: Check console output for classification results
 
-#### Indentation Not Working
-- **Cause**: Using spaces instead of `&nbsp;` entities
-- **Solution**: Replace spaces with proper `&nbsp;` entities
-- **Rule**: Must use exactly `&nbsp;` (not regular spaces)
+#### HTML Not Interactive
+- **Cause**: JavaScript disabled or browser restrictions
+- **Solution**: Enable JavaScript in browser settings
+- **Alternative**: Static view still provides document structure
 
 #### Print Colors Not Showing
 - **Cause**: Browser print settings
@@ -312,46 +350,13 @@ This output helps identify parsing issues and verify document structure.
 
 ### Architecture Improvements
 - **Plugin System**: Extensible functionality framework
-- **API Interface**: REST API for external integration
-- **Configuration Management**: External configuration files
-- **Internationalization**: Multi-language support
-
-## Contributing
-
-### Development Setup
-1. Clone or download the project
-2. Ensure Python 3.6+ is installed
-3. No additional dependencies required
-4. Run tests (when available)
-
-### Code Contributions
-- Follow existing code style and documentation standards
-- Add comprehensive tests for new features
-- Update documentation for any changes
-- Ensure backward compatibility when possible
-
-### Bug Reports
-Include the following information:
-- Python version and operating system
-- Input markdown file (or relevant excerpt)
-- Expected vs. actual behavior
-- Error messages or console output
-- Browser information (for HTML issues)
-
-## License and Legal
-
-This project is created by Attila Gallai <attila@tux-net.hu> in 2025. Please check with the author regarding usage rights and distribution permissions.
-
-## Contact and Support
-
-For questions, issues, or contributions related to this project, please contact the author Attila Gallai <attila@tux-net.hu>.
+- **API Development**: RESTful service for remote access
+- **Cloud Integration**: Online storage and collaboration
+- **Mobile Support**: Responsive design improvements
 
 ---
 
-[← Back to Main README](../README.md) | [🔧 Main Module](main.md) | [🔍 Parsing Module](parse_req_md.md) | [🎨 HTML Generation](gen_html_doc.md)
+[← Back to Main README](../README.md) | [🔧 Main Module](main.md) | [🔍 Parsing Module](parse_req_md.md) | [🎨 HTML Generation](gen_html_doc.md) | [📁 Project Config](project.md)
 
----
-
-*This documentation was automatically generated as part of the Requirement Editor project. Last updated: 2025*
-
-**Last Updated:** 2025-07-09 14:40
+*Documentation generated for Requirement Editor v1.0.0*  
+*Last updated: 2025-01-09 17:35*
