@@ -195,8 +195,10 @@ class TestCommandLineInterface:
         assert 'class="subtitle' in html_content, "Should contain subtitle elements"
         assert 'class="requirement' in html_content, "Should contain requirement elements"
         assert 'class="comment' in html_content, "Should contain comment elements"
+        assert 'class="dattr' in html_content, "Should contain dattr elements"
         assert '1001 Req:' in html_content, "Should preserve requirement IDs"
         assert '1030 Comm:' in html_content, "Should process comment IDs"
+        assert '1031 Dattr:' in html_content, "Should process dattr IDs"
         
         # Should contain interactive elements
         assert 'toggleCollapse' in html_content, "Should contain interactive JavaScript"

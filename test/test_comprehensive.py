@@ -131,6 +131,38 @@ def test_complete_workflow():
             print("✗ Failed to load project configuration")
             return False
         
+        # Step 6: Test Terminal Editor Integration Points
+        print("\n6. Testing Terminal Editor Integration Points...")
+        
+        # Test that we can import terminal editor modules
+        try:
+            from libs.terminal_editor import TerminalEditor
+            print("✓ Terminal editor module imports successfully")
+            
+            # Test that terminal editor can be instantiated with project config support
+            editor = TerminalEditor()
+            if hasattr(editor, 'project_config'):
+                print("✓ Terminal editor has project_config attribute")
+            else:
+                print("✗ Terminal editor missing project_config attribute")
+                return False
+                
+            # Test that the required project config methods exist
+            required_methods = ['_load_project_config', '_save_project_config', '_show_project_info']
+            for method in required_methods:
+                if hasattr(editor, method):
+                    print(f"✓ Terminal editor has {method} method")
+                else:
+                    print(f"✗ Terminal editor missing {method} method")
+                    return False
+            
+        except ImportError as e:
+            print(f"✗ Failed to import terminal editor: {e}")
+            return False
+        except Exception as e:
+            print(f"✗ Error testing terminal editor integration: {e}")
+            return False
+
         print("\n" + "=" * 70)
         print("🎉 ALL WORKFLOW TESTS PASSED SUCCESSFULLY!")
         print("=" * 70)

@@ -1,5 +1,4 @@
-# Requirement document for Requirement Editor  
-&nbsp;&nbsp;1031 Dattr: Created at: 2025-07-08 Modified at: 2025-07-10
+# Requirement document for Requirement Editor - #1 
 &nbsp;&nbsp;1030 Comm: *This project is for providiing application to writing requirement documents. The requirements has a document level title and sub sections with sub titles. A requirement documentum is a list of classified requirements, that shall be testable and implementable clearly. The document contain comments to give more information to make clear thinks.*  
 &nbsp;&nbsp;**Requirement representation in data**  
 &nbsp;&nbsp;&nbsp;&nbsp;1000 Req: The requirements shall be saved in data structure, that represents the hierarchy of the requirements.  

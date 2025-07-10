@@ -71,6 +71,7 @@ HTML Generation Pipeline
 | **SUBTITLE** | Light gray (#ecf0f1) | Blue left border | Bold text, collapsible |
 | **REQUIREMENT** | Light green (#e8f5e8) | Green left border | ID display, collapsible |
 | **COMMENT** | Light yellow (#fff3cd) | Yellow left border | Italic text, collapsible |
+| **DATTR** | Light cyan (#e1f5fe) | Blue left border | Monospace font, collapsible |
 | **UNKNOWN** | Light gray (#f8f9fa) | Gray left border | Standard formatting |
 
 ## Interactive Features

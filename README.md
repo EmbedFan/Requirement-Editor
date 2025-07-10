@@ -80,10 +80,11 @@ test_input.md → ReadMDFile() → ClassifyParts() → _build_hierarchy() → Ge
 ## Features
 
 ### Parsing Engine (libs/parse_req_md.py)
-- **Intelligent Classification**: Automatically identifies titles, subtitles, requirements, and comments
+- **Intelligent Classification**: Automatically identifies titles, subtitles, requirements, comments, and data attributes
 - **Hierarchical Structure Building**: Creates parent-child relationships based on HTML `&nbsp;` indentation
-- **ID Management**: Preserves and tracks requirement and comment ID numbers
+- **ID Management**: Preserves and tracks requirement, comment, and data attribute ID numbers
 - **Comment Processing**: Intelligent removal of asterisk formatting while preserving content
+- **Data Attribute Support**: Specialized handling for structured metadata and key-value information
 - **Robust Error Handling**: Graceful processing of malformed or irregular markdown
 - **UTF-8 Support**: Full international character support for global requirements
 
@@ -145,6 +146,14 @@ The system recognizes specific markdown patterns for different element types:
 - Format: `{indentation}{number} Comm: *{description}*`
 - Asterisks automatically removed from description
 - Yellow styling in HTML output
+
+#### Data Attributes
+```markdown
+&nbsp;&nbsp;&nbsp;&nbsp;1003 Dattr: Created at: <CRAT><br>Modified at: <MODAT>
+```
+- Format: `{indentation}{number} Dattr: {key-value data}`
+- Used for metadata and structured information
+- Cyan styling with monospace font in HTML output
 
 ### Indentation Rules
 - **2 `&nbsp;` entities = 1 indentation level**

@@ -1,6 +1,6 @@
 # Requirement Editor Documentation
 
-[← Back to Main README](../README.md) | [🔧 Main Module](main.md) | [🔍 Parsing Module](parse_req_md.md) | [🎨 HTML Generation](gen_html_doc.md) | [📁 Project Config](project.md)
+[← Back to Main README](../README.md) | [🔧 Main Module](main.md) | [🔍 Parsing Module](parse_req_md.md) | [🎨 HTML Generation](gen_html_doc.md) | [📁 Project Config](project.md) | [⌨️ Terminal Editor](TERMINAL_EDITOR.md)
 
 ---
 
@@ -28,17 +28,22 @@ This documentation reflects the comprehensive inline documentation updates imple
 
 ```
 python/
-├── main.py                    # Enhanced CLI interface and workflow orchestrator
+├── main.py                    # Enhanced CLI interface with terminal editor support
+├── demo_terminal_editor.py    # Demo script showcasing terminal editor usage
 ├── libs/
 │   ├── parse_req_md.py       # Advanced parsing engine with sophisticated algorithms
 │   ├── gen_html_doc.py       # Professional HTML generation with interactive features
-│   └── project.py            # Comprehensive configuration management system
+│   ├── project.py            # Comprehensive configuration management system
+│   ├── md_edit.py            # In-memory markdown editor for requirement documents
+│   └── terminal_editor.py    # Interactive terminal-based editor for document editing
 ├── test/
 │   ├── test_runner.py        # Automated test runner with HTML reporting
 │   ├── test_cli.py           # Complete CLI interface testing suite
 │   ├── test_project_config.py # Project configuration validation tests
 │   ├── test_comprehensive.py # End-to-end integration testing
 │   ├── test_simple.py        # Core functionality unit tests
+│   ├── test_md_edit_line_based.py # Comprehensive md_edit.py testing suite
+│   ├── test_md_edit_integration.py # Integration tests for md_edit.py
 │   └── test_stylesheet_config.py # Stylesheet configuration testing
 │   ├── data/
 │   │   ├── test_input.md     # Sample requirement document for testing
@@ -51,7 +56,8 @@ python/
 │   ├── main.md               # main.py documentation
 │   ├── parse_req_md.md       # parse_req_md.py documentation
 │   ├── gen_html_doc.md       # gen_html_doc.py documentation
-│   └── project.md            # project.py documentation
+│   ├── project.md            # project.py documentation
+│   └── TERMINAL_EDITOR.md    # Terminal editor documentation and usage guide
 └── LICENSE                   # MIT License file
 ```
 
@@ -59,9 +65,12 @@ python/
 
 1. **Installation**: No external dependencies required - uses Python standard library only
 2. **Configuration**: Edit `cfg_inputfile` in `main.py` to point to your markdown file
-3. **Execution**: Run `python main.py`
+3. **Execution**: 
+   - Standard processing: `python main.py`
+   - Interactive terminal editor: `python main.py -ed`
 4. **Output**: HTML file generated with same name as input but `.html` extension
 5. **Testing**: Run `python test/test_runner.py` to execute all tests
+6. **Demo**: Run `python demo_terminal_editor.py` to see terminal editor capabilities
 
 ## Testing
 
@@ -95,10 +104,19 @@ main.py (Orchestrator)
 │   └── _build_hierarchy() - Hierarchy building
 ├── libs/gen_html_doc.py (HTML Generator)
 │   └── GenerateHTML() - Interactive HTML creation
-└── libs/project.py (Configuration Manager)
-    ├── ProjectConfig class - Project metadata management
-    ├── create_project_config() - New project creation
-    └── load_project_config() - Existing project loading
+├── libs/project.py (Configuration Manager)
+│   ├── ProjectConfig class - Project metadata management
+│   ├── create_project_config() - New project creation
+│   └── load_project_config() - Existing project loading
+├── libs/md_edit.py (In-Memory Editor)
+│   ├── MarkdownEditor class - Line number-based editing
+│   ├── add_item_*() - Content insertion methods
+│   ├── move_item_*() - Content movement methods
+│   └── delete_item() - Content removal
+├── libs/terminal_editor.py (Interactive Editor)
+│   ├── TerminalEditor class - Command-line interface
+│   ├── run() - Main editing loop
+│   └── Command processing - File operations and navigation
 └── SaveHTMLFile() - File output handling
 ```
 
@@ -113,9 +131,11 @@ test_input.md → ReadMDFile() → ClassifyParts() → _build_hierarchy() → Ge
 
 | Module | Primary Responsibility | Key Functions |
 |--------|----------------------|---------------|
-| `main.py` | Workflow orchestration, console interface | `main()`, `SaveHTMLFile()` |
+| `main.py` | Workflow orchestration, console interface, terminal editor integration | `main()`, `SaveHTMLFile()` |
 | `libs/parse_req_md.py` | Markdown parsing, content classification | `ReadMDFile()`, `ClassifyParts()`, `_build_hierarchy()` |
 | `libs/gen_html_doc.py` | HTML generation, styling, interactivity | `GenerateHTML()` |
+| `libs/md_edit.py` | In-memory document editing, line number-based operations | `MarkdownEditor class`, `add_item_*()`, `move_item_*()` |
+| `libs/terminal_editor.py` | Interactive terminal-based editing interface | `TerminalEditor class`, `run()`, command processing |
 
 ## Features
 
@@ -136,6 +156,14 @@ test_input.md → ReadMDFile() → ClassifyParts() → _build_hierarchy() → Ge
 - **Responsive Design**: Works on various screen sizes
 - **Security**: XSS protection through HTML escaping
 - **Performance**: Efficient O(n) algorithms for large documents
+
+### Editing Capabilities
+- **In-Memory Editing**: Advanced markdown document manipulation using `md_edit.py`
+- **Line Number-Based Operations**: Precise positioning and referencing system
+- **Terminal Interface**: Interactive command-line editor accessible via `main.py -ed`
+- **Hierarchical Operations**: Move, add, delete items while maintaining document structure
+- **Real-time Updates**: Immediate reflection of changes in document structure
+- **Command Set**: Comprehensive editing commands for all document operations
 
 ## Supported Markdown Syntax
 
@@ -368,7 +396,7 @@ This output helps identify parsing issues and verify document structure.
 
 ---
 
-[← Back to Main README](../README.md) | [🔧 Main Module](main.md) | [🔍 Parsing Module](parse_req_md.md) | [🎨 HTML Generation](gen_html_doc.md) | [📁 Project Config](project.md)
+[← Back to Main README](../README.md) | [🔧 Main Module](main.md) | [🔍 Parsing Module](parse_req_md.md) | [🎨 HTML Generation](gen_html_doc.md) | [📁 Project Config](project.md) | [⌨️ Terminal Editor](TERMINAL_EDITOR.md)
 
 *Documentation generated for Requirement Editor v1.0.0*  
-*Last updated: 2025-01-09 17:35*
+*Last updated: 2025-07-10 (Terminal Editor Integration)*

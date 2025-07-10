@@ -74,6 +74,16 @@ class TestStylesheetConfiguration:
                 'parent': 1,
                 'children': [],
                 'children_refs': []
+            },
+            {
+                'line_number': 4,
+                'type': 'DATTR',
+                'indent': 1,
+                'id': 1002,
+                'description': 'Created at: <CRAT><br>Modified at: <MODAT>',
+                'parent': 1,
+                'children': [],
+                'children_refs': []
             }
         ]
     
@@ -109,7 +119,7 @@ class TestStylesheetConfiguration:
         
         # Test 2: Template contains required CSS classes
         required_classes = [
-            '.title', '.subtitle', '.requirement', '.comment', '.unknown',
+            '.title', '.subtitle', '.requirement', '.comment', '.dattr', '.unknown',
             '.indent-0', '.indent-1', '.indent-2', '.indent-3', '.indent-4',
             '.line-number', '.collapsible', '.collapsible-content', '.controls'
         ]
@@ -224,6 +234,7 @@ class TestStylesheetConfiguration:
         .title { color: #800000; font-size: 2.5em; }
         .requirement { background-color: #f0f8ff; border-left: 5px solid #4169e1; }
         .comment { background-color: #fff8dc; border-left: 5px solid #ffa500; }
+        .dattr { background-color: #e6f3ff; border-left: 5px solid #007acc; }
         .subtitle { background-color: #f5f5dc; border-left: 5px solid #4b0082; }
         .unknown { background-color: #f5f5f5; border-left: 5px solid #808080; }
         .controls { margin-bottom: 30px; text-align: center; }

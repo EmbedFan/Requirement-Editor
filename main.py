@@ -35,10 +35,11 @@ Document Element Classification:
 - SUBTITLE: Section subsections with indentation (&nbsp;&nbsp;**Subtitle** format)
 - REQUIREMENT: Numbered requirements (&nbsp;&nbsp;1001 Req: Description format)
 - COMMENT: Numbered comments (&nbsp;&nbsp;*1001 Comm: Description* format)
+- DATTR: Data attributes with metadata (&nbsp;&nbsp;1001 Dattr: Key-value data format)
 - UNKNOWN: Other markdown content (preserved with appropriate styling)
 
 Interactive HTML Features:
-- Color-coded element types: green=requirements, yellow=comments, blue=subtitles
+- Color-coded element types: green=requirements, yellow=comments, blue=subtitles, cyan=dattr
 - Click-to-expand/collapse functionality for all elements except main titles
 - Line number references for traceability between markdown source and HTML output
 - Print-optimized CSS with background color preservation for professional PDF output
@@ -150,7 +151,7 @@ def show_help():
     to help users understand how to use the Requirement Editor application.
     """
     print("=" * 80)
-    print("REQUIREMENT EDITOR - Markdown to Interactive HTML Converter")
+    print("REQUIREMENT EDITOR - Markdown to HTML Converter")
     print("=" * 80)
     print()
     print("DESCRIPTION:")
@@ -159,16 +160,20 @@ def show_help():
     print()
     print("USAGE:")
     print("  python main.py                           # Use default input file")
-    print("  python main.py -h                       # Show this help information")
+    print("  python main.py -h                        # Show this help information")
     print("  python main.py -md2html <filepath>       # Convert specific markdown file")
+    print("  python main.py -ed [filepath]            # Start terminal editor (optionally load file)")
     print()
     print("COMMAND LINE OPTIONS:")
     print("  -h                     Show help information and usage examples")
     print("  -md2html <filepath>     Convert specified markdown file to HTML")
+    print("  -ed [filepath]         Start terminal-based interactive editor")
     print()
     print("EXAMPLES:")
     print("  python main.py -md2html requirements.md")
     print("  python main.py -md2html \"C:\\\\Documents\\\\specs.md\"")
+    print("  python main.py -ed                       # Start editor with new document")
+    print("  python main.py -ed requirements.md       # Start editor and load file")
     print("  python main.py -md2html ../project/requirements.md")
     print("  python main.py -md2html test_input.md")
     print("  python main.py -md2html example.md")
@@ -183,6 +188,7 @@ def show_help():
     print("  - SUBTITLE: Section headers with indentation")
     print("  - REQUIREMENT: Requirements with ID numbers (e.g., 1001 Req: description)")
     print("  - COMMENT: Comments with ID numbers (e.g., 1001 Comm: description)")
+    print("  - DATTR: Data attributes with metadata (e.g., 1001 Dattr: key-value data)")
     print("  - UNKNOWN: Other markdown content")
     print()
     print("AUTHOR: Attila Gallai <attila@tux-net.hu>")
@@ -218,6 +224,36 @@ def process_command_line():
         show_help()
         sys.exit(0)  # Success exit for help
     
+    # Terminal editor option
+    if len(args) >= 1 and args[0] == "-ed":
+        # Import the terminal editor
+        try:
+            from libs.terminal_editor import TerminalEditor
+            editor = TerminalEditor()
+            
+            # Check if a file was specified to load
+            if len(args) == 2:
+                initial_file = args[1]
+                # Validate file exists if specified
+                if not os.path.exists(initial_file):
+                    print(f"Warning: Input file not found: {initial_file}")
+                    print("Starting with empty document...")
+                    editor.run()
+                else:
+                    editor.run(initial_file)
+            else:
+                editor.run()
+            
+            sys.exit(0)  # Terminal editor handles its own exit
+            
+        except ImportError as e:
+            print(f"Error: Could not import terminal editor: {e}")
+            print("Please ensure all required modules are available.")
+            sys.exit(1)
+        except Exception as e:
+            print(f"Error starting terminal editor: {e}")
+            sys.exit(1)
+    
     # Convert specific file option
     if len(args) >= 1 and args[0] == "-md2html":
         if len(args) != 2:
@@ -250,6 +286,7 @@ def process_command_line():
     print("  python main.py                           # Use default input file")
     print("  python main.py -h                       # Show help information")
     print("  python main.py -md2html <filepath>       # Convert specific file")
+    print("  python main.py -ed [filepath]            # Start terminal editor")
     print()
     print("Use 'python main.py -h' for detailed help information.")
     sys.exit(1)  # Error exit for invalid arguments
@@ -305,7 +342,7 @@ def main():
     
     Example Console Output:
     ```
-    Successfully read 1247 characters from C:\...\test_input.md
+    Successfully read 1247 characters from C:\\...\\test_input.md
     
     Classified 15 parts:
     ----------------------------------------------------------------------------------------------------
@@ -315,7 +352,7 @@ def main():
     Line  2: Type: SUBTITLE     | Indent: 1 | ID:  N/A | Parent: 1 | Children: [3, 4]  
              Description: User Interface...
     
-    HTML file saved successfully: C:\...\test_input.html
+    HTML file saved successfully: C:\\...\\test_input.html
     ```
     """
 

@@ -29,7 +29,10 @@ consistency and compatibility across application versions:
     "project_creation_date": "2025-07-09 14:40",
     "project_last_modification_date": "2025-07-09 15:20",
     "application_version": "1.0.0",
-    "style_template_path": "path/to/custom_stylesheet.css"
+    "style_template_path": "path/to/custom_stylesheet.css",
+    "editor_settings": {
+        "display_mode": "compact"
+    }
 }
 ```
 
@@ -39,6 +42,8 @@ Field Descriptions:
 - project_last_modification_date: ISO timestamp of last configuration change
 - application_version: Version of Requirement Editor for compatibility tracking
 - style_template_path: Optional path to custom CSS stylesheet template
+- editor_settings: Dictionary containing editor preferences and display settings
+  - display_mode: Terminal editor display mode ("compact" or "full")
 
 Working Directory Policy:
 All project configuration files are automatically created in the current working
@@ -190,7 +195,10 @@ class ProjectConfig:
                 "project_creation_date": current_time,
                 "project_last_modification_date": current_time,
                 "application_version": APPLICATION_VERSION,
-                "style_template_path": None
+                "style_template_path": None,
+                "editor_settings": {
+                    "display_mode": "compact"
+                }
             }
             
             return self.save_project()
@@ -244,6 +252,14 @@ class ProjectConfig:
             # Set default value for optional fields if not present
             if "style_template_path" not in self.config_data:
                 self.config_data["style_template_path"] = None
+            
+            # Set default editor settings if not present (backward compatibility)
+            if "editor_settings" not in self.config_data:
+                self.config_data["editor_settings"] = {
+                    "display_mode": "compact"
+                }
+            elif "display_mode" not in self.config_data["editor_settings"]:
+                self.config_data["editor_settings"]["display_mode"] = "compact"
             
             # Update modification date and save
             self.update_modification_date()
@@ -395,6 +411,63 @@ class ProjectConfig:
         self.config_data["style_template_path"] = template_path
         self.update_modification_date()
     
+    def get_editor_settings(self) -> Dict[str, Any]:
+        """
+        Get the editor settings from project configuration.
+        
+        Returns:
+            dict: Editor settings dictionary with display preferences.
+                 Default settings if configuration not loaded or settings missing.
+        """
+        if "editor_settings" in self.config_data:
+            return self.config_data["editor_settings"].copy()
+        else:
+            return {"display_mode": "compact"}
+    
+    def get_display_mode(self) -> str:
+        """
+        Get the display mode setting from project configuration.
+        
+        Returns:
+            str: Display mode ("compact" or "full"). Defaults to "compact".
+        """
+        editor_settings = self.get_editor_settings()
+        return editor_settings.get("display_mode", "compact")
+    
+    def set_display_mode(self, display_mode: str) -> None:
+        """
+        Update the display mode setting in project configuration.
+        
+        Args:
+            display_mode (str): Display mode ("compact" or "full").
+            
+        Side Effects:
+            - Updates config_data['editor_settings']['display_mode']
+            - Updates modification date to current time
+            - Does not automatically save - call save_project() to persist changes
+        """
+        # Ensure editor_settings exists
+        if "editor_settings" not in self.config_data:
+            self.config_data["editor_settings"] = {}
+        
+        self.config_data["editor_settings"]["display_mode"] = display_mode
+        self.update_modification_date()
+    
+    def set_editor_settings(self, editor_settings: Dict[str, Any]) -> None:
+        """
+        Update the complete editor settings in project configuration.
+        
+        Args:
+            editor_settings (dict): Dictionary containing editor settings.
+            
+        Side Effects:
+            - Updates config_data['editor_settings']
+            - Updates modification date to current time
+            - Does not automatically save - call save_project() to persist changes
+        """
+        self.config_data["editor_settings"] = editor_settings.copy()
+        self.update_modification_date()
+
     def get_all_config(self) -> Dict[str, Any]:
         """
         Get complete project configuration as dictionary.
@@ -437,6 +510,12 @@ class ProjectConfig:
         print(f"Last Modified:     {self.config_data.get('project_last_modification_date', 'N/A')}")
         print(f"App Version:       {self.config_data.get('application_version', 'N/A')}")
         print(f"Style Template:    {self.config_data.get('style_template_path', 'Default (hardcoded)')}")
+        
+        # Display editor settings
+        editor_settings = self.get_editor_settings()
+        print(f"Editor Settings:")
+        print(f"  Display Mode:    {editor_settings.get('display_mode', 'compact')}")
+        
         print(f"Config File:       {self.config_file_path}")
         print("=" * 60)
 

@@ -12,6 +12,8 @@ test/
 ├── test_simple.py              # Simple unit tests for basic functionality
 ├── test_stylesheet_config.py   # Tests for stylesheet configuration system
 ├── test_reporter.py            # HTML test report generator
+├── test_md_edit_line_based.py  # Comprehensive tests for md_edit.py module
+├── test_md_edit_integration.py # Integration tests for md_edit.py with real data
 ├── results/                    # Test execution results and reports
 └── data/
     ├── test_input.md           # Sample markdown requirement document
@@ -136,6 +138,107 @@ Basic unit tests for core functionality including parsing and classification.
 
 ### test_project_config.py
 Tests for the project configuration management system including security features and file operations.
+
+## MD Edit Module Tests
+
+The `md_edit.py` module has dedicated test suites with comprehensive coverage:
+
+### Core Functionality Tests
+```bash
+# Test the line number-based editing API
+cd test
+python test_md_edit_line_based.py
+```
+
+### Integration Tests
+```bash
+# Test with real requirement document data
+cd test  
+python test_md_edit_integration.py
+```
+
+### md_edit.py Implementation Details
+
+The `md_edit.py` module uses a **line number-based** system for positioning and referencing elements within requirement documents. All operations work with line numbers that are automatically updated after insertions, deletions, and movements.
+
+### Available md_edit Test Files
+
+#### 1. test_md_edit_line_based.py ✅ CURRENT
+**Status**: Active - Tests the current line number-based implementation
+
+**Comprehensive Test Coverage**:
+- ✅ Basic functionality (line number system, lookups)
+- ✅ Editing operations (add before/after/under, move operations)
+- ✅ Hierarchical operations (parent-child relationships)
+- ✅ Deletion operations (with and without children)
+- ✅ Type changes (requirement ↔ comment conversions)
+- ✅ Search operations (by description, case sensitivity, special characters)
+- ✅ Edge cases and error handling (invalid inputs, boundary conditions)
+- ✅ Advanced hierarchical operations (deep nesting, complex moves)
+- ✅ Bulk operations (multiple items, performance testing)
+- ✅ Data integrity verification (consistency checks, ID uniqueness)
+- ✅ Undo-like scenarios (change reversal, state management)
+
+**Test Results**: 11/11 tests passed ✅
+
+#### 2. test_md_edit_integration.py ✅ CURRENT
+**Status**: Active - Integration tests with real data using line numbers
+
+**Description**: Tests the line number-based API with real test data from `test/data/test_input.md`.
+
+**Coverage**:
+- ✅ Real document parsing and editing
+- ✅ Complex editing operations on actual requirement documents
+- ✅ Data integrity verification
+- ✅ Performance with larger documents
+
+**Test Results**: 2/2 tests passed ✅
+
+### md_edit.py API Summary
+
+**Core Editing Operations**:
+- `add_item_before(line_number, type, description, item_id=None)`
+- `add_item_after(line_number, type, description, item_id=None)`
+- `add_item_under(line_number, type, description, item_id=None)`
+- `move_item_before(source_line, target_line)`
+- `move_item_after(source_line, target_line)`
+- `move_item_under(source_line, target_line)`
+
+**Content Operations**:
+- `get_content(line_number)`
+- `update_content(line_number, new_description)`
+- `delete_item(line_number, delete_children=True)`
+- `change_item_type(line_number, new_type, new_item_id=None)`
+
+**Search & Navigation**:
+- `find_by_item_id(item_id, item_type=None)` → returns line number
+- `find_by_description(pattern, case_sensitive=False)` → returns line numbers
+- `get_children(line_number)` → returns child line numbers
+- `get_parent(line_number)` → returns parent line number
+
+**Information**:
+- `get_item_info(line_number)` → returns complete item dict
+- `list_all_items()` → returns summary of all items
+- `get_classified_parts()` → returns full structure
+
+### Enhanced Test Coverage Statistics
+
+The md_edit line-based test suite includes comprehensive coverage with:
+- **11 test suites** covering all aspects of functionality
+- **Over 50 individual test assertions**
+- **Performance testing** with larger documents
+- **Error handling and boundary condition** testing
+- **Deep hierarchy testing** (5+ indent levels)
+- **Bulk operations testing** (5+ items at once)
+- **Data integrity verification** after complex operations
+
+### Development History
+
+1. **Original Implementation**: Line number-based system
+2. **Refactor Attempt**: Object ID-based system (completed and tested)
+3. **Reversion**: Back to line number-based system (current)
+
+The object ID-based implementation was fully functional and tested, but was reverted as requested. All current tests focus on the line number-based approach.
 
 ## Adding New Tests
 

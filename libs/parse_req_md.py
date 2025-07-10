@@ -16,6 +16,7 @@ Document Structure Analysis:
 - Subtitles: Lines with HTML &nbsp; indentation followed by **bold** formatting
 - Requirements: Lines with &nbsp; indentation + number + "Req:" pattern
 - Comments: Lines with &nbsp; indentation + number + "Comm:" pattern (asterisks auto-removed)
+- Data Attributes: Lines with &nbsp; indentation + number + "Dattr:" pattern
 - Unknown: Any other content (preserved with appropriate indentation level)
 
 Indentation Processing System:
@@ -33,6 +34,7 @@ Indentation Rules:
 Pattern Recognition:
 - Requirement Pattern: /^\d+\s+Req:\s*(.+)$/ - captures ID and description
 - Comment Pattern: /^\d+\s+Comm:\s*(.+)$/ - captures ID and description with asterisk removal
+- Data Attribute Pattern: /^\d+\s+Dattr:\s*(.+)$/ - captures ID and structured data description
 - Subtitle Pattern: /^\*\*(.+)\*\*$/ - captures bold-formatted section headers
 - Title Pattern: /^#+\s*(.+)$/ - captures markdown heading levels (# ## ### etc.)
 
@@ -175,6 +177,7 @@ def ClassifyParts(mdContent):
     - Lines starting with '#' -> TITLE (indent = 0, highest level)
     - Lines with &nbsp; + number + "Req:" -> REQUIREMENT (indent based on &nbsp; count)
     - Lines with &nbsp; + number + "Comm:" -> COMMENT (indent based on &nbsp; count)
+    - Lines with &nbsp; + number + "Dattr:" -> DATTR (indent based on &nbsp; count)
     - Lines with &nbsp; + "**text**" -> SUBTITLE (indent based on &nbsp; count)
     - All other content -> UNKNOWN (indent based on &nbsp; count)
     
@@ -279,8 +282,8 @@ def ClassifyParts(mdContent):
             # Remove leading &nbsp; entities for easier parsing
             clean_line = temp_line.strip()
             
-            # Check for requirement/comment pattern: number followed by "Req:" or "Comm:"
-            req_pattern = r'^(\d+)\s+(Req|Comm):\s*(.+)$'
+            # Check for requirement/comment/dattr pattern: number followed by "Req:", "Comm:", or "Dattr:"
+            req_pattern = r'^(\d+)\s+(Req|Comm|Dattr):\s*(.+)$'
             match = re.match(req_pattern, clean_line)
             
             if match:
@@ -289,7 +292,13 @@ def ClassifyParts(mdContent):
                 description = match.group(3)
                 
                 part['id'] = int(req_id)
-                part['type'] = 'REQUIREMENT' if req_type == 'Req' else 'COMMENT'
+                
+                if req_type == 'Req':
+                    part['type'] = 'REQUIREMENT'
+                elif req_type == 'Comm':
+                    part['type'] = 'COMMENT'
+                elif req_type == 'Dattr':
+                    part['type'] = 'DATTR'
                 
                 # Process description based on type
                 if req_type == 'Comm':

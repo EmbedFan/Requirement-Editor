@@ -32,6 +32,7 @@ Element Type Visual Design:
 - SUBTITLE: Bold section headers with gray background and blue left border accent
 - REQUIREMENT: Green-accented containers with clear requirement identification
 - COMMENT: Yellow-accented containers with italic text styling for distinction
+- DATTR: Blue-accented containers with monospace font for structured data display
 - UNKNOWN: Gray-accented containers for unclassified content with neutral styling
 
 Interactive Features Implementation:
@@ -219,6 +220,17 @@ body {
     font-style: italic;
 }
 
+.dattr {
+    background-color: #cdffba;
+    //border-left: 4px solid #0288d1;
+    padding: 10px 15px;
+    margin: 2px 0;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    color: #10451b;
+    font-weight: bold;
+}
+
 .unknown {
     background-color: #f8f9fa;
     border-left: 4px solid #6c757d;
@@ -360,6 +372,11 @@ body {
     .comment {
         background-color: #fff3cd !important;
         border-left: 4px solid #ffc107 !important;
+    }
+    
+    .dattr {
+        background-color: #e1f5fe !important;
+        border-left: 4px solid #0288d1 !important;
     }
     
     .unknown {
@@ -693,6 +710,13 @@ def _generate_element_html(part):
         element_html = f'''
         <div class="comment {indent_class} {collapsible_class}" onclick="toggleCollapse(this)">
             {line_info}{comment_id}{_escape_html(part["description"])}
+        </div>'''
+        
+    elif part['type'] == 'DATTR':
+        dattr_id = f'<span class="req-id">{part["id"]} Dattr:</span>' if part['id'] else ''
+        element_html = f'''
+        <div class="dattr {indent_class} {collapsible_class}" onclick="toggleCollapse(this)">
+            {line_info}{dattr_id}{_escape_html(part["description"])}
         </div>'''
         
     else:  # UNKNOWN

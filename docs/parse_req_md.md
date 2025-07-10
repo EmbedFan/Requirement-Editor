@@ -47,8 +47,16 @@ Parsing Pipeline
 - **Pattern Recognition Details**: Complete regex pattern explanations
 - **Integration Guidelines**: Best practices for module integration
 - **Performance Analysis**: Algorithmic complexity and optimization notes
+
+## Element Classification
+
+| **Element Type** | **Pattern Recognition** | **Purpose** | **Indentation** |
+|------------------|-------------------------|-------------|-----------------|
+| **TITLE** | Lines starting with '#' | Document/section headers | Fixed at level 0 |
+| **SUBTITLE** | `&nbsp;` + "**text**" | Section subsections | Based on `&nbsp;` count |
 | **REQUIREMENT** | `&nbsp;` + number + "Req:" | Functional requirements | Based on `&nbsp;` count |
 | **COMMENT** | `&nbsp;` + number + "Comm:" | Additional information | Based on `&nbsp;` count |
+| **DATTR** | `&nbsp;` + number + "Dattr:" | Data attributes/metadata | Based on `&nbsp;` count |
 | **UNKNOWN** | Any other content | Preserved content | Based on `&nbsp;` count |
 
 ## Indentation System
@@ -124,9 +132,9 @@ def ClassifyParts(mdContent: str) -> list[dict]
 {
     'line_number': int,        # Original line number (1-based)
     'original_line': str,      # Complete unmodified line text
-    'type': str,              # 'TITLE', 'SUBTITLE', 'REQUIREMENT', 'COMMENT', 'UNKNOWN'
+    'type': str,              # 'TITLE', 'SUBTITLE', 'REQUIREMENT', 'COMMENT', 'DATTR', 'UNKNOWN'
     'indent': int,            # Indentation level (0, 1, 2, etc.)
-    'id': int|None,           # Requirement/Comment ID number if applicable
+    'id': int|None,           # Requirement/Comment/Dattr ID number if applicable
     'description': str,       # Processed description text
     'parent': int|None,       # Line number of parent element (None for root)
     'children': list,         # List of line numbers of direct children
