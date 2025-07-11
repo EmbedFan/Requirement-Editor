@@ -525,8 +525,8 @@ def create_project_config(input_md_file_path: str, project_name: str = None) -> 
     Convenience function to create a new project configuration.
     
     Creates a new ProjectConfig instance and initializes it with the specified
-    input markdown file path. The configuration file is always saved to the 
-    current working directory to ensure proper project organization.
+    input markdown file path. The configuration file is saved in the same 
+    directory as the input markdown file for proper organization.
     
     Args:
         input_md_file_path (str): Path to the source markdown requirements file.
@@ -538,17 +538,17 @@ def create_project_config(input_md_file_path: str, project_name: str = None) -> 
         None: If creation failed due to errors.
         
     Side Effects:
-        - Creates project configuration JSON file in current working directory
+        - Creates project configuration JSON file in same directory as input file
         - File name format: "{project_name}_config.json" or "{md_filename}_config.json"
         
     Example:
-        >>> # Creates "requirements_config.json" in current directory
-        >>> project = create_project_config("requirements.md")
+        >>> # Creates "requirements_config.json" in same directory as requirements.md
+        >>> project = create_project_config("/path/to/requirements.md")
         >>> if project:
         ...     project.print_project_info()
         >>>
-        >>> # Creates "myproject_config.json" in current directory  
-        >>> project = create_project_config("requirements.md", "myproject")
+        >>> # Creates "myproject_config.json" in same directory as input file
+        >>> project = create_project_config("/path/to/requirements.md", "myproject")
     """
     try:
         # Generate project name from input file if not provided
@@ -557,9 +557,10 @@ def create_project_config(input_md_file_path: str, project_name: str = None) -> 
             input_filename = os.path.splitext(os.path.basename(input_md_file_path))[0]
             project_name = input_filename
         
-        # Create config file name and ensure it's in current working directory
+        # Create config file name in the same directory as the input file
+        input_dir = os.path.dirname(os.path.abspath(input_md_file_path))
         config_filename = f"{project_name}_config.json"
-        config_file_path = os.path.join(os.getcwd(), config_filename)
+        config_file_path = os.path.join(input_dir, config_filename)
         
         project = ProjectConfig(config_file_path)
         if project.create_new_project(input_md_file_path):

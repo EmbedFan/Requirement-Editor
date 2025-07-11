@@ -234,13 +234,20 @@ def process_command_line():
             # Check if a file was specified to load
             if len(args) == 2:
                 initial_file = args[1]
-                # Validate file exists if specified
-                if not os.path.exists(initial_file):
+                
+                # Process filename - try to find with .md extension if needed
+                processed_file = editor._process_filename_for_loading(initial_file)
+                
+                if processed_file:
+                    # File found (possibly with .md extension added)
+                    editor.run(processed_file)
+                else:
+                    # No valid file found
                     print(f"Warning: Input file not found: {initial_file}")
+                    if not initial_file.endswith('.md'):
+                        print(f"Also tried: {initial_file}.md")
                     print("Starting with empty document...")
                     editor.run()
-                else:
-                    editor.run(initial_file)
             else:
                 editor.run()
             

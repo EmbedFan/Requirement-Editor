@@ -18,11 +18,16 @@ python main.py -ed test/data/test_input.md
 ### First Time Usage
 
 1. **Start the editor**: `python main.py -ed`
-2. **Create new document**: `new`
-3. **Add your first requirement**: `add after 1 REQUIREMENT 'System shall provide user authentication'`
-4. **View document**: `list`
-5. **Save**: `saveas my_requirements.md`
-6. **Get help anytime**: `help`
+2. **Create new document**: `new` (creates a document with title, dattr, comment, and sample requirement)
+3. **View the default structure**: `list`
+4. **Edit the default items**: 
+   - `edit 1 'My Project Requirements'` (title)
+   - ⚠️ **DATTR** (line 2) is read-only - contains timestamps managed by editor
+   - `edit 3 'Created for project documentation'` (comment)
+   - `edit 4 'My first requirement'` (requirement)
+5. **Add more requirements**: `add after 4 REQUIREMENT 'System shall provide user authentication'`
+6. **Save**: `saveas my_requirements.md` ⚠️ **Note**: Use `saveas` after `new` since no filename is set yet
+7. **Get help anytime**: `help`
 
 ## 📚 Command Reference
 
@@ -30,11 +35,34 @@ python main.py -ed test/data/test_input.md
 
 | Command | Description | Example |
 |---------|-------------|---------|
-| `new` | Create new document | `new` |
+| `new` | Create new document with default structure | `new` |
 | `load <file>` | Load markdown file | `load requirements.md` |
-| `save` | Save current document | `save` |
+| `save` | Save current document ⚠️ | `save` |
 | `saveas <file>` | Save as new filename | `saveas new_reqs.md` |
 | `export <file>` | Export to HTML | `export output.html` |
+
+⚠️ **Important**: After creating a new document with `new`, you must use `saveas <filename>` for the first save since no filename is set yet. The `save` command will show an error message but won't exit the program.
+
+**Saveas Filename Processing**: The `saveas` command automatically handles filename extensions and file conflicts:
+
+- **No extension**: Automatically adds `.md` extension
+  - Input: `saveas my_document` → Output: `my_document.md`
+- **Wrong extension**: Changes extension to `.md` with warning
+  - Input: `saveas my_doc.txt` → Output: `my_doc.md` (with warning)
+- **Correct extension**: Uses filename as-is
+  - Input: `saveas my_doc.md` → Output: `my_doc.md` (no changes)
+- **File exists**: Prompts for overwrite confirmation
+  - Shows warning and asks "Do you want to overwrite it? (y/N)"
+  - User can accept (y/yes) or decline (n/no/Enter)
+  - Cancelling preserves the original file
+
+**New Document Structure**: The `new` command creates a document with:
+- **Title**: "New Requirement Document" 
+- **DATTR**: Document timestamps (DATTR001) - *automatically managed, read-only*
+- **Comment**: Default comment explaining document creation (COMM001)
+- **Requirement**: Sample requirement that you can edit or replace (REQ001)
+
+**DATTR Management**: DATTR items contain creation and modification timestamps in the format "Created at: YYYY-MM-DD HH:MM Modified at: YYYY-MM-DD HH:MM". These are automatically updated by the editor and cannot be modified by users.
 
 ### ✏️ Document Editing
 
@@ -167,22 +195,30 @@ load project_specs.md
 # Start editor
 python main.py -ed
 
-# Create basic document structure
+# Create new document (with default structure including DATTR)
 new
-add after 1 SUBTITLE 'User Requirements'
-add under 2 REQUIREMENT 'System shall provide user login'
-add after 3 COMMENT 'Authentication via OAuth 2.0'
-add after 2 SUBTITLE 'Security Requirements'
-add under 5 REQUIREMENT 'All passwords shall be hashed'
 
-# View result
+# View the default structure
 list
 
-# Save work
-saveas user_requirements.md
+# Customize the default content
+edit 1 'User Authentication Requirements'
+edit 2 'Authentication system metadata and configuration'  
+edit 3 'Requirements for user login and security'
+edit 4 'System shall provide secure user authentication'
+
+# Add more requirements
+add after 4 REQUIREMENT 'System shall enforce strong password policies'
+add after 5 REQUIREMENT 'System shall support multi-factor authentication'
+
+# View updated document
+list
+
+# Save work (automatically updates modification date with HH:mm)
+saveas user_auth_requirements.md
 
 # Export to HTML
-export user_requirements.html
+export user_auth_requirements.html
 
 # Exit
 quit
@@ -191,6 +227,16 @@ quit
 ## 🐛 Troubleshooting
 
 ### Common Issues
+
+**"DATTR items are read-only" message when editing**
+- This happens when you try to edit a DATTR item (line 2 in new documents)
+- **Solution**: DATTR items contain timestamps managed automatically by the editor
+- They are updated automatically when saving and cannot be manually edited
+
+**"No filename specified" error when using `save`**
+- This happens when you create a new document with `new` and try to use `save`
+- **Solution**: Use `saveas <filename>` for the first save of a new document
+- After the first save, you can use `save` to update the same file
 
 **File not found when loading**
 - Check file path is correct

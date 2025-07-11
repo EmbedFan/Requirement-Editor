@@ -29,7 +29,7 @@ Configuration Management System
 ├── Metadata Tracking        # Creation and modification timestamp management
 ├── Version Compatibility    # Application version tracking and migration support
 ├── Custom Template Support  # CSS stylesheet template path management
-├── Working Directory Policy # Organized project structure enforcement
+├── Document Directory Policy # Organized project structure enforcement
 └── Error Recovery System   # Comprehensive validation and recovery mechanisms
 ```
 
@@ -67,14 +67,14 @@ Each project configuration contains the following enhanced fields:
 - **project_last_modification_date**: Timestamp when project was last modified (YYYY-MM-DD HH:MM)
 - **application_version**: Version of the Requirement Editor application used
 
-## Working Directory Policy
+## Document Directory Policy
 
-**Important**: All project configuration files are automatically created in the current working directory, regardless of user input. This design decision ensures:
+**Important**: All project configuration files are automatically created in the same directory as the markdown document being managed. This design decision ensures:
 
-- Consistent project organization
-- Prevention of configuration files scattered across filesystem
-- Clear project boundaries and structure
-- Simplified file management
+- Configuration files stay with their associated documents
+- Moving/copying documents preserves their settings
+- No configuration files cluttering the working directory
+- Clear association between documents and their configurations
 
 ## Classes
 
@@ -197,15 +197,15 @@ Creates a new project configuration with automatic filename generation.
 
 **Behavior:**
 - Generates filename as `{project_name}_config.json`
-- Always saves to current working directory
+- Always saves to same directory as the markdown document
 - Extracts project name from input file if not provided
 
 **Example:**
 ```python
-# Creates "requirements_config.json" in current directory
+# Creates "requirements_config.json" in same directory as requirements.md
 project = create_project_config("requirements.md")
 
-# Creates "myproject_config.json" in current directory
+# Creates "myproject_config.json" in same directory as requirements.md
 project = create_project_config("requirements.md", "myproject")
 ```
 
@@ -223,7 +223,7 @@ Creates a new project configuration with custom filename.
 **Security Features:**
 - Strips path components from filename for security
 - Ensures .json extension is added if missing
-- Always saves to current working directory
+- Always saves to current working directory (Note: This function is an exception to the document directory policy)
 
 **Example:**
 ```python
@@ -337,7 +337,7 @@ Project configuration files follow these naming conventions:
 - **Custom Name**: `{project_name}_config.json`
 - **Custom Filename**: `{specified_name}.json`
 
-All files are created in the current working directory to maintain project organization.
+All files are created in the same directory as the markdown document being managed to maintain proper document-configuration association.
 
 ## Constants
 

@@ -32,9 +32,9 @@ Indentation Rules:
 - Level n: 2n &nbsp; entities - supports unlimited nesting depth
 
 Pattern Recognition:
-- Requirement Pattern: /^\d+\s+Req:\s*(.+)$/ - captures ID and description
-- Comment Pattern: /^\d+\s+Comm:\s*(.+)$/ - captures ID and description with asterisk removal
-- Data Attribute Pattern: /^\d+\s+Dattr:\s*(.+)$/ - captures ID and structured data description
+- Requirement Pattern: /^\\d+\\s+Req:\\s*(.+)$/ - captures ID and description
+- Comment Pattern: /^\\d+\\s+Comm:\\s*(.+)$/ - captures ID and description with asterisk removal
+- Data Attribute Pattern: /^\\d+\\s+Dattr:\\s*(.+)$/ - captures ID and structured data description
 - Subtitle Pattern: /^\*\*(.+)\*\*$/ - captures bold-formatted section headers
 - Title Pattern: /^#+\s*(.+)$/ - captures markdown heading levels (# ## ### etc.)
 
@@ -132,10 +132,10 @@ import re
 
 def ReadMDFile(filename):
     """
-    Read a markdown file and return its contents as a string with proper error handling.
+    Read a markdown file and return its contents as a string with robust encoding handling.
     
-    Attempts to read the specified markdown file using UTF-8 encoding, which is
-    standard for markdown files and supports international characters.
+    Attempts to read the specified markdown file using multiple encodings to handle
+    files created by different tools and systems. Tries encodings in order of preference.
     
     Args:
         filename (str): Path to the markdown file to read. Can be absolute or relative path.
@@ -144,25 +144,53 @@ def ReadMDFile(filename):
         str: Complete contents of the file as a string if successful.
         None: If file cannot be read due to missing file or I/O errors.
         
+    Encoding Strategy:
+        1. UTF-8 (most common for markdown files)
+        2. UTF-16 (Windows PowerShell echo output)
+        3. UTF-8 with BOM
+        4. Latin-1/ISO-8859-1 (fallback, works for most files)
+        
     Raises:
         Prints error messages to console but does not raise exceptions:
         - FileNotFoundError: When the specified file doesn't exist
-        - IOError: When file exists but cannot be read (permissions, corruption, etc.)
-        
-    Note:
-        Uses UTF-8 encoding which supports international characters commonly
-        found in technical documentation and requirements.
+        - IOError: When file exists but cannot be read with any encoding
     """
-    try:
-        with open(filename, 'r', encoding='utf-8') as file:
-            content = file.read()
-        return content
-    except FileNotFoundError:
-        print(f"Error: File '{filename}' not found.")
-        return None
-    except IOError as e:
-        print(f"Error reading file '{filename}': {e}")
-        return None
+    
+    # List of encodings to try, in order of preference
+    encodings_to_try = [
+        'utf-8',           # Standard UTF-8
+        'utf-16',          # Windows PowerShell echo output
+        'utf-8-sig',       # UTF-8 with BOM
+        'utf-16le',        # UTF-16 Little Endian
+        'utf-16be',        # UTF-16 Big Endian
+        'latin-1',         # ISO-8859-1 (fallback - can read any byte sequence)
+    ]
+    
+    for encoding in encodings_to_try:
+        try:
+            with open(filename, 'r', encoding=encoding) as file:
+                content = file.read()
+            
+            # If we used a non-UTF-8 encoding, inform the user
+            if encoding != 'utf-8':
+                print(f"ℹ️  File read using {encoding} encoding")
+            
+            return content
+            
+        except UnicodeDecodeError:
+            # This encoding didn't work, try the next one
+            continue
+        except FileNotFoundError:
+            print(f"Error: File '{filename}' not found.")
+            return None
+        except IOError as e:
+            print(f"Error reading file '{filename}': {e}")
+            return None
+    
+    # If we get here, none of the encodings worked
+    print(f"Error: Could not read file '{filename}' with any supported encoding.")
+    print("Supported encodings: " + ", ".join(encodings_to_try))
+    return None
 
 
 def ClassifyParts(mdContent):

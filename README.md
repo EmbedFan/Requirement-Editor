@@ -9,6 +9,8 @@ The Requirement Editor is a sophisticated Python-based tool for converting markd
 - **Hierarchical Structure Building**: Stack-based algorithm for building parent-child relationships
 - **Interactive HTML Generation**: Professional web documents with expand/collapse functionality
 - **Modern Web Features**: Responsive design, print optimization, and accessibility support
+- **Terminal Editor Interface**: Interactive command-line editor with real-time document visualization
+- **Tab Completion Support**: Smart file/directory completion for efficient navigation
 - **Command-Line Interface**: Comprehensive CLI for batch processing and automation
 - **Configurable Styling**: Support for custom CSS templates and professional theming
 - **Robust Error Handling**: Comprehensive validation and graceful error recovery
@@ -546,29 +548,30 @@ main.py               # ← Workflow coordination only
 - **Processing Pipeline**: Insert validation or transformation steps between modules
 
 #### Testing Strategy
-```python
-# Unit testing approach for each module:
 
-# Test parsing module
-def test_classify_parts():
-    content = "# Title\n&nbsp;&nbsp;1 Req: Test requirement"
-    parts = ClassifyParts(content)
-    assert len(parts) == 2
-    assert parts[0]['type'] == 'TITLE'
-    assert parts[1]['type'] == 'REQUIREMENT'
+The project includes comprehensive testing organized in the `test/` directory:
 
-# Test HTML generation
-def test_generate_html():
-    parts = [{'type': 'TITLE', 'description': 'Test'}]
-    html = GenerateHTML(parts, "Test Doc")
-    assert '<h1>' in html
-    assert 'Test' in html
+```bash
+# Run all tests from project root
+python test/test_comprehensive.py
 
-# Test integration workflow
-def test_main_workflow():
-    # End-to-end testing of complete process
-    pass
+# Run specific functionality tests
+python test/test_save_issue.py           # Document creation tests
+python test/test_type_aliases.py         # Type alias functionality
+python test/test_saveas_final.py         # Save functionality tests
+
+# Run from test directory
+cd test
+python test_comprehensive.py
 ```
+
+**Test Categories:**
+- **Unit Tests**: Individual module functionality (`test_md_edit_*.py`)
+- **Integration Tests**: Cross-module functionality (`test_comprehensive.py`)
+- **Feature Tests**: Specific feature validation (`test_type_aliases.py`, `test_saveas_*.py`)
+- **Regression Tests**: Error prevention (`test_cancellation_fix.py`)
+
+All new features should include corresponding tests in the `test/` directory following the established patterns.
 
 ### Code Quality Standards
 - **PEP 8 Compliance**: Python code follows standard style conventions
@@ -717,11 +720,36 @@ This project is the intellectual property of Attila Gallai <attila@tux-net.hu>. 
 # Basic usage
 python main.py
 
+# Interactive terminal editor
+python main.py -ed
+
 # Check Python version
 python --version
 
 # Verify installation
 python main.py  # Should process test_input.md
+```
+
+### Terminal Editor Features
+```bash
+# Start interactive editor
+python main.py -ed
+
+# Tab completion (Linux/Mac with readline)
+req-editor> load test<TAB>        # Auto-complete files
+req-editor> save docs/proj<TAB>   # Complete paths
+
+# Manual completion (Windows/fallback)
+req-editor> complete load test    # Show matching files
+req-editor> complete save docs/   # Show directory contents
+
+# Essential commands
+req-editor> help                  # Show all commands
+req-editor> new                   # Create new document
+req-editor> load <file>           # Load existing file
+req-editor> save                  # Save current document
+req-editor> list                  # Display document
+req-editor> quit                  # Exit editor
 ```
 
 ### File Requirements

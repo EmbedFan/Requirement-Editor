@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 # Add libs to path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from project import ProjectConfig, create_project_config, load_project_config
 

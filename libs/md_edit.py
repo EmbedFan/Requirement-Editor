@@ -183,12 +183,31 @@ class MarkdownEditor:
         return None
     
     def _get_next_item_id(self, id_type: str) -> int:
-        """Get the next available ID for requirements, comments, or dattr."""
-        max_id = 0
+        """Get the next available ID for requirements, comments, or dattr starting from 1000."""
+        existing_ids = set()
         for part in self.classified_parts:
             if part.get('id') and part['type'] in ['REQUIREMENT', 'COMMENT', 'DATTR']:
-                max_id = max(max_id, part['id'])
-        return max_id + 1
+                current_id = part['id']
+                # Handle both string IDs (like "REQ001") and integer IDs
+                try:
+                    if isinstance(current_id, str):
+                        # Extract numeric part from string IDs like "REQ001" -> 1
+                        import re
+                        match = re.search(r'(\d+)$', current_id)
+                        if match:
+                            numeric_id = int(match.group(1))
+                            existing_ids.add(numeric_id)
+                    elif isinstance(current_id, int):
+                        existing_ids.add(current_id)
+                except (ValueError, AttributeError):
+                    pass  # Skip invalid IDs
+        
+        # Find the next available ID starting from 1000
+        next_id = 1000
+        while next_id in existing_ids:
+            next_id += 1
+        
+        return next_id
     
     def _create_new_part(self, item_type: str, description: str, indent: int = 0, 
                         item_id: Optional[int] = None) -> Dict[str, Any]:
