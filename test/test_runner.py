@@ -19,6 +19,10 @@ from datetime import datetime
 # Import the HTML report generator
 from test_reporter import TestReportGenerator
 
+# environment setup for UTF-8 encoding when tests are run
+env = os.environ.copy()
+env["PYTHONIOENCODING"] = "utf-8"
+env["PYTHONUTF8"] = "1"
 
 def run_test_file(test_file_path, reporter):
     """Run a single test file and return success status."""
@@ -31,10 +35,11 @@ def run_test_file(test_file_path, reporter):
     
     try:
         result = subprocess.run([sys.executable, test_file_path], 
-                              capture_output=True, 
-                              text=True,
-                              check=True,
-                              cwd=os.path.dirname(test_file_path))
+                            capture_output=True, 
+                            text=True,
+                            check=True,
+                            env=env,
+                            cwd=os.path.dirname(test_file_path))
         
         duration = time.time() - start_time
         
@@ -179,10 +184,11 @@ def run_integration_test():
         
         # Run main.py
         result = subprocess.run([sys.executable, str(main_py)], 
-                              capture_output=True, 
-                              text=True,
-                              check=True,
-                              cwd=str(project_root))
+                            capture_output=True, 
+                            text=True,
+                            check=True,
+                            env=env,
+                            cwd=str(project_root))
         
         duration = time.time() - start_time
         

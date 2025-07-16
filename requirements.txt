@@ -1,0 +1,16 @@
+# Requirement Editor Dependencies
+# 
+# This file lists optional dependencies for enhanced functionality.
+# The application can run with just Python's standard library.
+
+# Optional: Enhanced terminal editing functionality (Windows)
+# Provides tab completion and command history in terminal editor
+pyreadline3>=3.4.1; sys_platform == "win32"
+
+# Optional: Enhanced terminal editing functionality (Unix/Linux/macOS)  
+# Usually pre-installed on Unix systems
+readline; sys_platform != "win32"
+
+# Development/Testing dependencies (optional)
+# These are only needed if you want to run the test suite
+# No additional packages required - uses only standard library
