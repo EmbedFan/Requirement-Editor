@@ -5,27 +5,40 @@ Test to reproduce the exact display issue reported by the user.
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from parse_req_md import ReadMDFile, ClassifyParts
-from terminal_editor import TerminalEditor
+from libs.parse_req_md import ReadMDFile, ClassifyParts
+from libs.terminal_editor import TerminalEditor
 
 def test_exact_issue():
     """Test the exact content and see if we can reproduce the issue."""
-    test_file = os.path.join(os.path.dirname(__file__), 'data', 'new-2.md')
+    test_file = os.path.join(os.path.dirname(__file__), 'data', 'test_input.md')
     
     print("=== Reproducing User's Issue ===")
     print()
     
+    # Check if file exists first
+    if not os.path.exists(test_file):
+        print(f"❌ Test file '{test_file}' not found.")
+        return False
+    
     # 1. Test raw content
     content = ReadMDFile(test_file)
+    if content is None:
+        print(f"❌ Failed to read file '{test_file}'")
+        return False
+        
     print(f"1. Raw file content:")
     print(f"   Length: {len(content)}")
-    print(f"   Content: {repr(content)}")
+    print(f"   Content preview: {repr(content[:100])}...")
     print()
     
     # 2. Test parsing
     parts = ClassifyParts(content)
+    if not parts:
+        print("❌ Failed to classify content or no parts found")
+        return False
+        
     print(f"2. Parsed parts ({len(parts)} found):")
     for i, part in enumerate(parts):
         print(f"   Part {i+1}: Line {part['line_number']}, Type {part['type']}, Desc: {repr(part['description'])}")

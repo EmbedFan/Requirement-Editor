@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test the modification date update functionality when saving.
+Test the modification date update functionality when saving (simplified version).
 """
 
 import sys
@@ -8,7 +8,6 @@ import os
 import time
 import json
 import tempfile
-import shutil
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from libs.terminal_editor import TerminalEditor
@@ -17,18 +16,11 @@ def test_modification_date_update():
     """Test that modification date is updated when saving files."""
     print("🧪 Testing modification date update functionality...")
     
-    # Use temporary directory to avoid file conflicts
-    temp_dir = tempfile.mkdtemp()
-    try:
+    # Use a temporary directory to avoid conflicts
+    with tempfile.TemporaryDirectory() as temp_dir:
         test_file = os.path.join(temp_dir, "test_mod_date.md")
         config_file = os.path.join(temp_dir, "test_mod_date_config.json")
         
-        # Ensure files don't exist
-        if os.path.exists(test_file):
-            os.remove(test_file)
-        if os.path.exists(config_file):
-            os.remove(config_file)
-            
         editor = TerminalEditor()
         
         # Create new document
@@ -37,9 +29,13 @@ def test_modification_date_update():
         
         # Save the document to create a project config
         print("2. Saving document for the first time...")
-        result = editor._save_file(test_file)
-        if not result:
-            print("   ❌ Failed to save document")
+        try:
+            result = editor._save_file(test_file)
+            if not result:
+                print("   ❌ Failed to save document")
+                return False
+        except Exception as e:
+            print(f"   ❌ Exception during save: {e}")
             return False
         
         # Check if project config was created
@@ -48,8 +44,12 @@ def test_modification_date_update():
             return False
         
         # Read the initial modification date
-        with open(config_file, 'r') as f:
-            initial_config = json.load(f)
+        try:
+            with open(config_file, 'r') as f:
+                initial_config = json.load(f)
+        except Exception as e:
+            print(f"   ❌ Failed to read config file: {e}")
+            return False
         
         initial_mod_date = initial_config.get("project_last_modification_date")
         print(f"   Initial modification date: {initial_mod_date}")
@@ -62,15 +62,23 @@ def test_modification_date_update():
         print("3. Waiting 2 seconds and then saving again...")
         time.sleep(2)
         
-        # Save the document again (should not trigger overwrite prompt since current_file is set)
-        result = editor._save_file()
-        if not result:
-            print("   ❌ Failed to save document second time")
+        # Save the document again
+        try:
+            result = editor._save_file()
+            if not result:
+                print("   ❌ Failed to save document second time")
+                return False
+        except Exception as e:
+            print(f"   ❌ Exception during second save: {e}")
             return False
         
         # Read the updated modification date
-        with open(config_file, 'r') as f:
-            updated_config = json.load(f)
+        try:
+            with open(config_file, 'r') as f:
+                updated_config = json.load(f)
+        except Exception as e:
+            print(f"   ❌ Failed to read updated config file: {e}")
+            return False
         
         updated_mod_date = updated_config.get("project_last_modification_date")
         print(f"   Updated modification date: {updated_mod_date}")
@@ -94,14 +102,6 @@ def test_modification_date_update():
         print("   ✓ Modification date was successfully updated with HH:mm format")
         print("4. Test completed successfully!")
         return True
-        
-    finally:
-        # Cleanup
-        try:
-            shutil.rmtree(temp_dir)
-            print("5. Cleanup completed")
-        except:
-            pass
 
 if __name__ == "__main__":
     if test_modification_date_update():

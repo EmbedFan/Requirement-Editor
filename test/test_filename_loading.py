@@ -8,9 +8,9 @@ import sys
 import tempfile
 
 # Add libs to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from terminal_editor import TerminalEditor
+from libs.terminal_editor import TerminalEditor
 
 def test_filename_processing():
     """Test the filename processing functionality."""

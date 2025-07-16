@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 
 # Add libs to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 def demonstrate_practical_usage():
     """Demonstrate how the config creation works in practical usage"""
@@ -52,7 +52,7 @@ The system shall store user data securely in an encrypted database.
         print(f"📄 Created markdown file: {md_file}")
         
         # Simulate what happens when terminal editor saves a file
-        from project import create_project_config
+        from libs.project import create_project_config
         
         base_name = os.path.splitext(os.path.basename(md_file))[0]
         project_config = create_project_config(md_file, base_name)

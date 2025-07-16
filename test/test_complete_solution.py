@@ -7,9 +7,9 @@ import os
 import sys
 
 # Add libs to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from terminal_editor import TerminalEditor
+from libs.terminal_editor import TerminalEditor
 
 def test_complete_solution():
     """Test the complete file loading solution."""

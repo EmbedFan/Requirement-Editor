@@ -7,9 +7,9 @@ import os
 import sys
 
 # Add libs to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from parse_req_md import ReadMDFile
+from libs.parse_req_md import ReadMDFile
 
 def test_encoding_fix():
     """Test the encoding fix for ReadMDFile."""

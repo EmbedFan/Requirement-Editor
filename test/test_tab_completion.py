@@ -5,9 +5,9 @@ Test tab completion functionality in the terminal editor.
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from terminal_editor import TerminalEditor, TabCompleter
+from libs.terminal_editor import TerminalEditor, TabCompleter
 
 def test_tab_completion():
     """Test the tab completion functionality."""

@@ -10,7 +10,7 @@ import tempfile
 # Add libs to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from project import ProjectConfig, create_project_config, load_project_config
+from libs.project import ProjectConfig, create_project_config, load_project_config
 
 def test_display_mode_functionality():
     """Test display mode saving and loading in project configuration."""

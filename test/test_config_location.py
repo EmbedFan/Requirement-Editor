@@ -10,9 +10,9 @@ import shutil
 from pathlib import Path
 
 # Add libs to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from project import create_project_config
+from libs.project import create_project_config
 
 def test_config_location():
     """Test that project config is created in the same directory as the markdown file"""

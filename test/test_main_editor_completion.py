@@ -5,9 +5,9 @@ Test the main terminal editor with tab completion functionality.
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from terminal_editor import TerminalEditor
+from libs.terminal_editor import TerminalEditor
 
 def test_main_editor():
     """Test the main editor functionality with tab completion."""

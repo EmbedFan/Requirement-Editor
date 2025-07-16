@@ -9,7 +9,7 @@ import sys
 import os
 
 # Add the libs directory to the Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 def check_environment():
     """Check the environment for tab completion support."""
@@ -73,7 +73,7 @@ def test_tab_completion_setup():
     print("=" * 50)
     
     try:
-        from terminal_editor import TabCompleter, TerminalEditor
+        from libs.terminal_editor import TabCompleter, TerminalEditor
         
         # Test TabCompleter
         print("Testing TabCompleter...")

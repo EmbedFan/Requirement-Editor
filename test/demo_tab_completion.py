@@ -9,7 +9,7 @@ import sys
 import os
 
 # Add the libs directory to the Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 def demonstrate_tab_completion():
     """Demonstrate how tab completion works."""
@@ -33,7 +33,7 @@ def demonstrate_tab_completion():
     print("3. Commands that support tab completion:")
     
     try:
-        from terminal_editor import TabCompleter
+        from libs.terminal_editor import TabCompleter
         completer = TabCompleter()
         print(f"   - {', '.join(completer.completion_commands)}")
     except:
@@ -50,7 +50,7 @@ def demonstrate_tab_completion():
     # Test actual file completion
     print("5. Live test of file completion:")
     try:
-        from terminal_editor import TabCompleter
+        from libs.terminal_editor import TabCompleter
         completer = TabCompleter()
         
         test_patterns = ["test", "main", "README"]

@@ -5,9 +5,9 @@ Comprehensive test of tab completion integration.
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from terminal_editor import TerminalEditor
+from libs.terminal_editor import TerminalEditor
 
 def comprehensive_completion_test():
     """Run comprehensive tests of the tab completion system."""

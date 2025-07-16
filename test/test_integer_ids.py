@@ -5,9 +5,9 @@ Test the integer ID fix for terminal editor.
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from terminal_editor import TerminalEditor
+from libs.terminal_editor import TerminalEditor
 
 def test_integer_ids():
     """Test that all IDs are now integers starting from 1000."""
@@ -27,7 +27,9 @@ def test_integer_ids():
         item_type = part['type']
         description = part['description'][:50] + "..." if len(part['description']) > 50 else part['description']
         
-        print(f"  {item_type:12} | ID: {item_id:6} | {description}")
+        # Handle None IDs properly
+        id_str = str(item_id) if item_id is not None else "None"
+        print(f"  {item_type:12} | ID: {id_str:6} | {description}")
     
     print()
     

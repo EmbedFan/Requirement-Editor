@@ -6,9 +6,9 @@ Tests various scenarios to reproduce the issue the user reported.
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from terminal_editor import TerminalEditor
+from libs.terminal_editor import TerminalEditor
 
 def test_display_scenarios():
     """Test different scenarios to identify the display issue."""

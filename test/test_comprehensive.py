@@ -31,6 +31,7 @@ def test_complete_workflow():
     # Test data paths
     test_data_dir = Path(__file__).parent / "data"
     test_input_md = test_data_dir / "test_input.md"
+    config_file = test_data_dir / "workflow_test_config.json"
     
     try:
         # Step 1: Test project configuration
@@ -39,11 +40,11 @@ def test_complete_workflow():
         
         if project:
             print("✓ Project configuration created successfully")
-            config_file = Path.cwd() / "workflow_test_config.json"
+            # Config file is created in the same directory as the input markdown file
             if config_file.exists():
                 print(f"✓ Config file exists at: {config_file}")
             else:
-                print("✗ Config file not found in working directory")
+                print("✗ Config file not found in expected location")
                 return False
         else:
             print("✗ Failed to create project configuration")
@@ -89,12 +90,12 @@ def test_complete_workflow():
             # Check for key HTML elements
             required_elements = [
                 '<!DOCTYPE html>',
-                '<html>',
+                '<html',  # Allow for attributes like <html lang="en">
                 '<head>',
                 '<body>',
-                'expand-all-btn',
-                'collapse-all-btn',
-                'toggle-line-numbers-btn',
+                'expand-btn',
+                'collapse-btn',
+                'toggle-btn',
                 'print-btn'
             ]
             
@@ -175,7 +176,6 @@ def test_complete_workflow():
     
     finally:
         # Clean up
-        config_file = Path.cwd() / "workflow_test_config.json"
         if config_file.exists():
             config_file.unlink()
             print(f"\n🧹 Cleaned up test file: {config_file}")

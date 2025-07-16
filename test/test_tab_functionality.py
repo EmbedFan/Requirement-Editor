@@ -5,7 +5,7 @@ Test to identify why tab completion is not working.
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 def test_readline_availability():
     """Test if readline is available and working."""
@@ -46,7 +46,7 @@ def test_readline_availability():
     # Test 2: Test TabCompleter directly
     print("2. Testing TabCompleter class...")
     try:
-        from terminal_editor import TabCompleter
+        from libs.terminal_editor import TabCompleter
         
         completer = TabCompleter()
         print("   ✅ TabCompleter created")
@@ -71,7 +71,7 @@ def test_readline_availability():
     # Test 3: Test TerminalEditor integration
     print("3. Testing TerminalEditor integration...")
     try:
-        from terminal_editor import TerminalEditor
+        from libs.terminal_editor import TerminalEditor
         
         editor = TerminalEditor()
         print("   ✅ TerminalEditor created")

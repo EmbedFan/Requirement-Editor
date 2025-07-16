@@ -5,9 +5,9 @@ Demonstrate the manual completion functionality.
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'libs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from terminal_editor import TerminalEditor
+from libs.terminal_editor import TerminalEditor
 
 def demo_manual_completion():
     """Demonstrate manual completion functionality."""
