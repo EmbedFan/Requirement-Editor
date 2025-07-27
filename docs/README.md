@@ -67,10 +67,25 @@ python/
 2. **Configuration**: Edit `cfg_inputfile` in `main.py` to point to your markdown file
 3. **Execution**: 
    - Standard processing: `python main.py`
-   - Interactive terminal editor: `python main.py -ed`
+   - Interactive terminal editor: `python main.py -ed` (⭐ **Recommended for beginners**)
+   - Load existing file in editor: `python main.py -ed requirements.md`
 4. **Output**: HTML file generated with same name as input but `.html` extension
 5. **Testing**: Run `python test/test_runner.py` to execute all tests
-6. **Demo**: Run `python demo_terminal_editor.py` to see terminal editor capabilities
+6. **Demo**: Run `python examples/demo_terminal_editor.py` to see terminal editor capabilities
+
+### Terminal Editor Quick Start
+```bash
+# Start interactive editor (recommended for new users)
+python main.py -ed
+
+# In the editor:
+> new                                    # Create new document
+> edit 1 'My Project Requirements'       # Change title
+> add after 4 REQUIREMENT 'User authentication required'  # Add requirement
+> saveas my_project.md                   # Save document
+> export                                 # Generate HTML (automatic filename)
+> help                                   # See all commands
+```
 
 ## Testing
 

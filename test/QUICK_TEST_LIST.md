@@ -35,6 +35,7 @@
 - test_working_tab.py
 - test_completion_comprehensive.py
 - test_main_editor_completion.py
+- test_enhanced_tab_completion.py
 
 ### Configuration
 - test_config_location.py
@@ -70,5 +71,5 @@
 - test_filename_loading.py
 - test_complete_solution.py
 
-**Total: 41 test files**  
-**Status: 40 working, 1 hanging (test_mod_date.py)**
+**Total: 42 test files**  
+**Status: 41 working, 1 hanging (test_mod_date.py)**

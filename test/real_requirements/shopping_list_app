@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Requirement Document for Requirement Editor</title>
+    <title>Requirement Document</title>
     <style>
 /* 
 HTML Document Stylesheet Template for Requirement Documents
@@ -97,16 +97,16 @@ body {
 
 /* Indentation classes for hierarchical structure */
 .indent-0 { margin-left: 0px; }
-.indent-1 { margin-left: 0px; }
-.indent-2 { margin-left: 30px; }
-.indent-3 { margin-left: 60px; }
-.indent-4 { margin-left: 90px; }
-.indent-5 { margin-left: 120px; }
-.indent-6 { margin-left: 150px; }
-.indent-7 { margin-left: 180px; }
-.indent-8 { margin-left: 210px; }
-.indent-9 { margin-left: 240px; }
-.indent-10 { margin-left: 270px; }
+.indent-1 { margin-left: 30px; }
+.indent-2 { margin-left: 60px; }
+.indent-3 { margin-left: 90px; }
+.indent-4 { margin-left: 120px; }
+.indent-5 { margin-left: 150px; }
+.indent-6 { margin-left: 180px; }
+.indent-7 { margin-left: 210px; }
+.indent-8 { margin-left: 240px; }
+.indent-9 { margin-left: 270px; }
+.indent-10 { margin-left: 300px; }
 
 /* Line number styling */
 .line-number {
@@ -258,99 +258,23 @@ body {
 <body>
     <div class="container">
         <div class="title indent-0">
-            <span class="line-number">[1]</span>Requirement document for Requirement Editor
+            <span class="line-number">[1]</span>Shopping List app - requirements
         </div>
-        <div class="dattr indent-1 " onclick="toggleCollapse(this)">
-            <span class="line-number">[2]</span><span class="req-id">1031 Dattr:</span>Created at: 2025-07-08 Modified at: 2025-07-10
+        <div class="dattr indent-4 " onclick="toggleCollapse(this)">
+            <span class="line-number">[3]</span><span class="req-id">1000 Dattr:</span>Created at: 2025-07-27 19:10 Modified at: 2025-07-27 19:16
         </div>
-        <div class="comment indent-1 " onclick="toggleCollapse(this)">
-            <span class="line-number">[3]</span><span class="req-id">1030 Comm:</span>This project is for providiing application to writing requirement documents. The requirements has a document level title and sub sections with sub titles. A requirement documentum is a list of classified requirements, that shall be testable and implementable clearly. The document contain comments to give more information to make clear thinks.
-        </div>
-        <div class="subtitle indent-1 collapsible" onclick="toggleCollapse(this)">
-            <span class="line-number">[4]</span>Requirement representation in data
-        </div>
-        <div class="collapsible-content expanded" id="content-4">
-        <div class="requirement indent-2 collapsible" onclick="toggleCollapse(this)">
-            <span class="line-number">[5]</span><span class="req-id">1000 Req:</span>The requirements shall be saved in data structure, that represents the hierarchy of the requirements.
-        </div>
-        <div class="collapsible-content expanded" id="content-5">
-        <div class="requirement indent-4 collapsible" onclick="toggleCollapse(this)">
-            <span class="line-number">[6]</span><span class="req-id">1001 Req:</span>Every requirement item shall be built from the following items: ID, Type: [TITLE, SUBTITLE, REQUIREMENT, COMMENT], Description, Implemented [TRUE, FALSE], Tested [TRUE, FALSE], Version [M.m], Baselined [integer], Deleted [TRUE, FALSE].
-        </div>
-        <div class="collapsible-content expanded" id="content-6">
-        <div class="requirement indent-6 " onclick="toggleCollapse(this)">
-            <span class="line-number">[7]</span><span class="req-id">1002 Req:</span>The ID shall be a unique integer. Once an ID has been assigned and the item is later removed, that ID shall never be reused.
-        </div>
-        <div class="requirement indent-6 " onclick="toggleCollapse(this)">
-            <span class="line-number">[8]</span><span class="req-id">1003 Req:</span>The type shall be one of the following unique enum values: [TITLE, SUBTITLE, REQUIREMENT, COMMENT].
-        </div>
-        <div class="requirement indent-6 " onclick="toggleCollapse(this)">
-            <span class="line-number">[9]</span><span class="req-id">1004 Req:</span>The description itself shall be a well-worded, easy to understand, not sophisticated high-level sentence or sentences that form a requirement or a comment.
-        </div>
-        <div class="requirement indent-6 " onclick="toggleCollapse(this)">
-            <span class="line-number">[10]</span><span class="req-id">1005 Req:</span>The &quot;Implemented&quot; field shall indicate whether the requirement has been implemented, and shall store a boolean value: [TRUE, FALSE].
-        </div>
-        <div class="requirement indent-6 collapsible" onclick="toggleCollapse(this)">
-            <span class="line-number">[11]</span><span class="req-id">1006 Req:</span>The &quot;Tested&quot; field shall indicate whether the requirement has been tested, and shall store a boolean value: [TRUE, FALSE].
-        </div>
-        <div class="collapsible-content expanded" id="content-11">
-        <div class="comment indent-8 " onclick="toggleCollapse(this)">
-            <span class="line-number">[12]</span><span class="req-id">1009 Comm:</span>Testing means the requirement has been validated through an appropriate process such as manual verification, automated test execution, or review to ensure it behaves as expected and fulfills its purpose.
-        </div>
-        </div>
-        <div class="requirement indent-6 collapsible" onclick="toggleCollapse(this)">
-            <span class="line-number">[13]</span><span class="req-id">1007 Req:</span>The &quot;Version&quot; field shall store the version number in the format M.m, where M is the major version and m is the minor version. These numbers shall be positive integers.
-        </div>
-        <div class="collapsible-content expanded" id="content-13">
-        <div class="comment indent-8 " onclick="toggleCollapse(this)">
-            <span class="line-number">[14]</span><span class="req-id">1008 Comm:</span>Examples — 1.0, 2.5, 3.12, 10.1 are valid version numbers. Values like 0.-1, 2.a, or 1.1.1 are invalid.
-        </div>
-        </div>
-        <div class="requirement indent-6 collapsible" onclick="toggleCollapse(this)">
-            <span class="line-number">[15]</span><span class="req-id">1012 Req:</span>The &quot;Baselined&quot; field shall be a positive integer between 0 and INTMAX.
-        </div>
-        <div class="collapsible-content expanded" id="content-15">
-        <div class="comment indent-8 " onclick="toggleCollapse(this)">
-            <span class="line-number">[16]</span><span class="req-id">1013 Comm:</span>The baseline means a set of requirements at a specific point in the project&#39;s lifetime. When a baseline is created, all requirements with a &quot;false&quot; deleted flag and the highest version number are duplicated with the new baseline number recorded in each copy. It means the document can have more than one baseline, and it is possible to make differences between them or print them out as separate documents.
-        </div>
-        </div>
-        <div class="requirement indent-6 " onclick="toggleCollapse(this)">
-            <span class="line-number">[17]</span><span class="req-id">1014 Req:</span>The &quot;Deleted&quot; field shall indicate whether a requirement is logically deleted. A deleted item shall remain in the database, shall be ignored during baseline creation and in the active view, but shall be available for review if needed.
-        </div>
-        </div>
-        </div>
-        <div class="requirement indent-2 collapsible" onclick="toggleCollapse(this)">
-            <span class="line-number">[18]</span><span class="req-id">1010 Req:</span>Every document shall be saved into a database (type is not defined at the moment).
-        </div>
-        <div class="collapsible-content expanded" id="content-18">
         <div class="comment indent-4 " onclick="toggleCollapse(this)">
-            <span class="line-number">[19]</span><span class="req-id">1011 Comm:</span>The database can be SQLite or any kind of Python structure saved in a file in a form it can be reloaded easily.
+            <span class="line-number">[5]</span><span class="req-id">1001 Comm:</span>The shopping list app is designed to support users throughout the entire shopping process — before, during, and after their trip. It helps with planning by allowing users to easily create and manage a &quot;What I want to buy&quot; list. The app aims to simplify grocery preparation, improve organization, and ensure that nothing important is forgotten while shopping.
         </div>
+        <div class="requirement indent-4 collapsible" onclick="toggleCollapse(this)">
+            <span class="line-number">[7]</span><span class="req-id">1002 Req:</span>The software shall provide functionalities to create, update, save, load and checkout items, sharing list between users.
         </div>
+        <div class="collapsible-content expanded" id="content-7">
+        <div class="requirement indent-6 " onclick="toggleCollapse(this)">
+            <span class="line-number">[9]</span><span class="req-id">1003 Req:</span>The software shall create a new list.
         </div>
-        <div class="subtitle indent-1 collapsible" onclick="toggleCollapse(this)">
-            <span class="line-number">[21]</span>User Interface Requirements
-        </div>
-        <div class="collapsible-content expanded" id="content-21">
-        <div class="requirement indent-2 collapsible" onclick="toggleCollapse(this)">
-            <span class="line-number">[22]</span><span class="req-id">1020 Req:</span>The application shall provide a user interface that allows hierarchical editing of requirement items.
-        </div>
-        <div class="collapsible-content expanded" id="content-22">
-        <div class="requirement indent-4 " onclick="toggleCollapse(this)">
-            <span class="line-number">[23]</span><span class="req-id">1021 Req:</span>The UI shall allow users to create, edit, delete, and reorder requirements using drag-and-drop functionality.
-        </div>
-        <div class="requirement indent-4 " onclick="toggleCollapse(this)">
-            <span class="line-number">[24]</span><span class="req-id">1022 Req:</span>The UI shall visually distinguish between requirement types using icons or formatting.
-        </div>
-        <div class="requirement indent-4 " onclick="toggleCollapse(this)">
-            <span class="line-number">[25]</span><span class="req-id">1023 Req:</span>The UI shall allow filtering by Implemented, Tested, and Baselined status.
-        </div>
-        <div class="requirement indent-4 " onclick="toggleCollapse(this)">
-            <span class="line-number">[26]</span><span class="req-id">1024 Req:</span>The UI shall support export and import of the document in HTML and Markdown format.
-        </div>
-        <div class="requirement indent-4 " onclick="toggleCollapse(this)">
-            <span class="line-number">[27]</span><span class="req-id">1025 Req:</span>The UI shall support baseline version comparison and difference highlighting.
-        </div>
+        <div class="requirement indent-6 " onclick="toggleCollapse(this)">
+            <span class="line-number">[11]</span><span class="req-id">1004 Req:</span>The software shall provide an operation to update the list.
         </div>
         </div>
     </div>

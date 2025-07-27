@@ -99,7 +99,7 @@ modified_parts = editor.get_classified_parts()
 
 Author: Attila Gallai <attila@tux-net.hu>
 Created: 2025-07-10
-Version: 1.0.0 - Line number-based editing system
+Version: 1.1.0 - Line number-based editing system
 License: MIT License (see LICENSE.txt)
 """
 
@@ -790,4 +790,114 @@ class MarkdownEditor:
         This is an alias for add_item_under() for backward compatibility.
         """
         return self.add_item_under(target_line, item_type, description, item_id)
+    
+    def repair_indentation(self) -> Dict[str, Any]:
+        """
+        Analyze and repair indentation issues in the document.
+        
+        Validates that indentation follows proper hierarchy rules:
+        - Root items (TITLE) should have indent 0
+        - Child items should have indent = parent_indent + 1
+        - No gaps in indentation levels
+        
+        Returns:
+            Dict containing repair results with keys:
+            - 'fixed_count': Number of items fixed
+            - 'fixes': List of fix descriptions
+            - 'warnings': List of potential issues
+            - 'success': Boolean indicating if repair was successful
+        """
+        fixes = []
+        warnings = []
+        fixed_count = 0
+        
+        try:
+            # First, rebuild parent-child relationships based on current position and indentation
+            self._update_parent_child_relationships()
+            
+            # Validate and fix indentation levels iteratively
+            # We may need multiple passes to fix cascading issues
+            max_iterations = 5
+            iteration = 0
+            
+            while iteration < max_iterations:
+                iteration_fixes = 0
+                
+                for part in self.classified_parts:
+                    line_num = part['line_number']
+                    current_indent = part['indent']
+                    expected_indent = 0
+                    
+                    # Calculate expected indentation based on parent
+                    if part['parent'] is not None:
+                        parent_part = self._find_part_by_line(part['parent'])
+                        if parent_part:
+                            expected_indent = parent_part['indent'] + 1
+                        else:
+                            warnings.append(f"Line {line_num}: Parent line {part['parent']} not found")
+                            continue
+                    else:
+                        # Root items should have indent 0
+                        expected_indent = 0
+                    
+                    # Check if indentation needs fixing
+                    if current_indent != expected_indent:
+                        old_indent = current_indent
+                        part['indent'] = expected_indent
+                        iteration_fixes += 1
+                        fixed_count += 1
+                        
+                        item_desc = part['description'][:30] + "..." if len(part['description']) > 30 else part['description']
+                        fixes.append(f"Line {line_num} ({part['type']}): '{item_desc}' - indent {old_indent} → {expected_indent}")
+                
+                # If no fixes were made in this iteration, we're done
+                if iteration_fixes == 0:
+                    break
+                    
+                # Rebuild relationships after fixing indentation
+                self._update_parent_child_relationships()
+            
+            # Final validation checks
+            max_indent = max(part['indent'] for part in self.classified_parts) if self.classified_parts else 0
+            if max_indent > 10:
+                warnings.append(f"Maximum indentation level {max_indent} exceeds recommended limit of 10")
+            
+            # Check for orphaned items (items with parents that don't exist)
+            for part in self.classified_parts:
+                if part['parent'] is not None:
+                    parent_exists = any(p['line_number'] == part['parent'] for p in self.classified_parts)
+                    if not parent_exists:
+                        warnings.append(f"Line {part['line_number']}: References non-existent parent line {part['parent']}")
+            
+            # Check for proper hierarchy sequence
+            for i, part in enumerate(self.classified_parts):
+                if part['indent'] > 0:
+                    # Find the previous item that should be the parent or at a shallower level
+                    valid_parent_found = False
+                    for j in range(i-1, -1, -1):
+                        prev_part = self.classified_parts[j]
+                        if prev_part['indent'] < part['indent']:
+                            valid_parent_found = True
+                            break
+                        elif prev_part['indent'] == part['indent']:
+                            # Same level is fine, continue looking for parent
+                            continue
+                    
+                    if not valid_parent_found and part['indent'] > 0:
+                        warnings.append(f"Line {part['line_number']}: Indentation level {part['indent']} has no valid parent in document hierarchy")
+            
+            return {
+                'fixed_count': fixed_count,
+                'fixes': fixes,
+                'warnings': warnings,
+                'success': True
+            }
+            
+        except Exception as e:
+            return {
+                'fixed_count': 0,
+                'fixes': [],
+                'warnings': [f"Error during indentation repair: {str(e)}"],
+                'success': False
+            }
 

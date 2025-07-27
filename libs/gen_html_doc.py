@@ -221,14 +221,17 @@ body {
 }
 
 .dattr {
-    background-color: #cdffba;
-    //border-left: 4px solid #0288d1;
-    padding: 10px 15px;
-    margin: 2px 0;
-    border-radius: 4px;
+    background-color: #fffef5;
+    border: 2px solid #ff8c00;
+    border-left: 6px solid #ff8c00;
+    padding: 8px 12px;
+    margin: 10px 0;
+    border-radius: 6px;
     font-family: 'Courier New', monospace;
-    color: #10451b;
-    font-weight: bold;
+    color: #cc6600;
+    font-weight: 900;
+    font-size: 0.85em;
+    box-shadow: 0 1px 3px rgba(255, 140, 0, 0.15);
 }
 
 .unknown {
@@ -247,16 +250,16 @@ body {
 
 /* Indentation classes for hierarchical structure */
 .indent-0 { margin-left: 0px; }
-.indent-1 { margin-left: 30px; }
-.indent-2 { margin-left: 60px; }
-.indent-3 { margin-left: 90px; }
-.indent-4 { margin-left: 120px; }
-.indent-5 { margin-left: 150px; }
-.indent-6 { margin-left: 180px; }
-.indent-7 { margin-left: 210px; }
-.indent-8 { margin-left: 240px; }
-.indent-9 { margin-left: 270px; }
-.indent-10 { margin-left: 300px; }
+.indent-1 { margin-left: 0px; }
+.indent-2 { margin-left: 30px; }
+.indent-3 { margin-left: 60px; }
+.indent-4 { margin-left: 90px; }
+.indent-5 { margin-left: 120px; }
+.indent-6 { margin-left: 150px; }
+.indent-7 { margin-left: 180px; }
+.indent-8 { margin-left: 210px; }
+.indent-9 { margin-left: 240px; }
+.indent-10 { margin-left: 270px; }
 
 /* Line number styling */
 .line-number {
@@ -375,8 +378,9 @@ body {
     }
     
     .dattr {
-        background-color: #e1f5fe !important;
-        border-left: 4px solid #0288d1 !important;
+        background-color: #fffef5 !important;
+        border: 2px solid #ff8c00 !important;
+        border-left: 6px solid #ff8c00 !important;
     }
     
     .unknown {

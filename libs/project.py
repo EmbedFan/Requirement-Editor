@@ -28,10 +28,15 @@ consistency and compatibility across application versions:
     "input_md_file_path": "path/to/requirements.md",
     "project_creation_date": "2025-07-09 14:40",
     "project_last_modification_date": "2025-07-09 15:20",
-    "application_version": "1.0.0",
+    "application_version": "1.1.0",
     "style_template_path": "path/to/custom_stylesheet.css",
     "editor_settings": {
-        "display_mode": "compact"
+        "display_mode": "compact",
+        "external_editor_path": "path/to/text_editor.exe"
+    },
+    "browser_settings": {
+        "browser_path": "path/to/browser.exe",
+        "window_name": "RequirementEditor"
     }
 }
 ```
@@ -44,6 +49,10 @@ Field Descriptions:
 - style_template_path: Optional path to custom CSS stylesheet template
 - editor_settings: Dictionary containing editor preferences and display settings
   - display_mode: Terminal editor display mode ("compact" or "full")
+  - external_editor_path: Optional path to external text editor executable
+- browser_settings: Dictionary containing web browser configuration
+  - browser_path: Optional path to web browser executable
+  - window_name: Window name for browser instances
 
 Working Directory Policy:
 All project configuration files are automatically created in the current working
@@ -114,7 +123,7 @@ allows for intelligent upgrades and compatibility warnings.
 
 Author: Attila Gallai <attila@tux-net.hu>
 Created: 2025-07-09
-Version: 1.0.0
+Version: 1.1.0
 License: MIT License (see LICENSE.txt)
 """
 
@@ -125,7 +134,7 @@ from typing import Dict, Optional, Any
 
 
 # Application version for project compatibility tracking
-APPLICATION_VERSION = "1.0.0"
+APPLICATION_VERSION = "1.1.0"
 
 # Standard datetime format for project timestamps
 DATETIME_FORMAT = "%Y-%m-%d %H:%M"
@@ -198,6 +207,9 @@ class ProjectConfig:
                 "style_template_path": None,
                 "editor_settings": {
                     "display_mode": "compact"
+                },
+                "browser_settings": {
+                    "window_name": "RequirementEditor"
                 }
             }
             
@@ -260,6 +272,14 @@ class ProjectConfig:
                 }
             elif "display_mode" not in self.config_data["editor_settings"]:
                 self.config_data["editor_settings"]["display_mode"] = "compact"
+            
+            # Set default browser settings if not present (backward compatibility)
+            if "browser_settings" not in self.config_data:
+                self.config_data["browser_settings"] = {
+                    "window_name": "RequirementEditor"
+                }
+            elif "window_name" not in self.config_data["browser_settings"]:
+                self.config_data["browser_settings"]["window_name"] = "RequirementEditor"
             
             # Update modification date and save
             self.update_modification_date()
@@ -466,6 +486,135 @@ class ProjectConfig:
             - Does not automatically save - call save_project() to persist changes
         """
         self.config_data["editor_settings"] = editor_settings.copy()
+        self.update_modification_date()
+
+    def get_external_editor_path(self) -> Optional[str]:
+        """
+        Get the external text editor path from project configuration.
+        
+        Returns:
+            str or None: Path to external text editor if configured, None otherwise.
+        """
+        editor_settings = self.get_editor_settings()
+        return editor_settings.get("external_editor_path")
+    
+    def set_external_editor_path(self, editor_path: Optional[str]) -> None:
+        """
+        Set the external text editor path in project configuration.
+        
+        Args:
+            editor_path (str or None): Path to external text editor executable.
+                                     Use None to clear the setting.
+            
+        Side Effects:
+            - Updates config_data['editor_settings']['external_editor_path']
+            - Updates modification date to current time
+            - Does not automatically save - call save_project() to persist changes
+        """
+        # Ensure editor_settings exists
+        if "editor_settings" not in self.config_data:
+            self.config_data["editor_settings"] = {}
+        
+        if editor_path is None:
+            # Remove the setting if it exists
+            if "external_editor_path" in self.config_data["editor_settings"]:
+                del self.config_data["editor_settings"]["external_editor_path"]
+        else:
+            self.config_data["editor_settings"]["external_editor_path"] = editor_path
+        
+        self.update_modification_date()
+
+    def get_browser_settings(self) -> Dict[str, Any]:
+        """
+        Get the browser settings from project configuration.
+        
+        Returns:
+            dict: Browser settings dictionary with browser preferences.
+                 Default settings if configuration not loaded or settings missing.
+        """
+        if "browser_settings" in self.config_data:
+            return self.config_data["browser_settings"].copy()
+        else:
+            return {"window_name": "RequirementEditor"}
+    
+    def get_browser_path(self) -> Optional[str]:
+        """
+        Get the web browser path from project configuration.
+        
+        Returns:
+            str or None: Path to web browser executable if configured, None otherwise.
+        """
+        browser_settings = self.get_browser_settings()
+        return browser_settings.get("browser_path")
+    
+    def set_browser_path(self, browser_path: Optional[str]) -> None:
+        """
+        Set the web browser path in project configuration.
+        
+        Args:
+            browser_path (str or None): Path to web browser executable.
+                                      Use None to clear the setting.
+            
+        Side Effects:
+            - Updates config_data['browser_settings']['browser_path']
+            - Updates modification date to current time
+            - Does not automatically save - call save_project() to persist changes
+        """
+        # Ensure browser_settings exists
+        if "browser_settings" not in self.config_data:
+            self.config_data["browser_settings"] = {"window_name": "RequirementEditor"}
+        
+        if browser_path is None:
+            # Remove the setting if it exists
+            if "browser_path" in self.config_data["browser_settings"]:
+                del self.config_data["browser_settings"]["browser_path"]
+        else:
+            self.config_data["browser_settings"]["browser_path"] = browser_path
+        
+        self.update_modification_date()
+    
+    def get_browser_window_name(self) -> str:
+        """
+        Get the browser window name from project configuration.
+        
+        Returns:
+            str: Browser window name. Defaults to "RequirementEditor".
+        """
+        browser_settings = self.get_browser_settings()
+        return browser_settings.get("window_name", "RequirementEditor")
+    
+    def set_browser_window_name(self, window_name: str) -> None:
+        """
+        Set the browser window name in project configuration.
+        
+        Args:
+            window_name (str): Window name for browser instances.
+            
+        Side Effects:
+            - Updates config_data['browser_settings']['window_name']
+            - Updates modification date to current time
+            - Does not automatically save - call save_project() to persist changes
+        """
+        # Ensure browser_settings exists
+        if "browser_settings" not in self.config_data:
+            self.config_data["browser_settings"] = {}
+        
+        self.config_data["browser_settings"]["window_name"] = window_name
+        self.update_modification_date()
+    
+    def set_browser_settings(self, browser_settings: Dict[str, Any]) -> None:
+        """
+        Update the complete browser settings in project configuration.
+        
+        Args:
+            browser_settings (dict): Dictionary containing browser settings.
+            
+        Side Effects:
+            - Updates config_data['browser_settings']
+            - Updates modification date to current time
+            - Does not automatically save - call save_project() to persist changes
+        """
+        self.config_data["browser_settings"] = browser_settings.copy()
         self.update_modification_date()
 
     def get_all_config(self) -> Dict[str, Any]:

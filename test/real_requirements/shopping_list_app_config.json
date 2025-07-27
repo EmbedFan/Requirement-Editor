@@ -1,0 +1,13 @@
+{
+    "input_md_file_path": "test\\real_requirements\\shopping_list_app.md",
+    "project_creation_date": "2025-07-27 17:55",
+    "project_last_modification_date": "2025-07-27 20:40",
+    "application_version": "1.0.0",
+    "style_template_path": null,
+    "editor_settings": {
+        "display_mode": "full"
+    },
+    "browser_settings": {
+        "window_name": "RequirementEditor-Demo"
+    }
+}

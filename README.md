@@ -5,19 +5,22 @@
 The Requirement Editor is a sophisticated Python-based tool for converting markdown-formatted technical requirement documents into professional, interactive HTML documents with modern web features. The system implements a complete document processing pipeline with intelligent parsing, hierarchical structure building, and advanced HTML generation capabilities.
 
 **Key Features:**
-- **Intelligent Document Parsing**: Automatic classification of requirement elements (titles, subtitles, requirements, comments)
+- **Intelligent Document Parsing**: Automatic classification of requirement elements (titles, subtitles, requirements, comments, DATTR)
 - **Hierarchical Structure Building**: Stack-based algorithm for building parent-child relationships
-- **Interactive HTML Generation**: Professional web documents with expand/collapse functionality
-- **Modern Web Features**: Responsive design, print optimization, and accessibility support
-- **Terminal Editor Interface**: Interactive command-line editor with real-time document visualization
-- **Tab Completion Support**: Smart file/directory completion for efficient navigation
+- **Interactive HTML Generation**: Professional web documents with expand/collapse functionality and DATTR field styling
+- **Modern Web Features**: Responsive design, print optimization, accessibility support, and orange/yellow DATTR styling
+- **Terminal Editor Interface**: Interactive command-line editor with real-time document visualization and smart export
+- **Tab Completion Support**: Smart file/directory completion for efficient navigation across all commands
+- **Type Aliases**: Fast editing with short aliases (TIT, SUB, REQ, COM) for improved productivity
+- **DATTR Management**: Automatic timestamp handling with read-only protection and visual styling
+- **Smart Export Features**: Automatic filename derivation and flexible HTML export options
 - **Command-Line Interface**: Comprehensive CLI for batch processing and automation
-- **Configurable Styling**: Support for custom CSS templates and professional theming
+- **Configurable Styling**: Support for custom CSS templates and professional theming with DATTR enhancements
 - **Robust Error Handling**: Comprehensive validation and graceful error recovery
 
 **Author:** Attila Gallai <attila@tux-net.hu>  
 **Created:** 2025-07-09  
-**Version:** 1.0.0  
+**Version:** 1.1.0  
 **License:** MIT License (see LICENSE.txt)
 
 ## System Architecture
@@ -27,18 +30,20 @@ The application follows a sophisticated modular design with clear separation of 
 
 ```
 Requirement Editor Application Stack
-├── main.py                    # Application orchestrator and CLI interface
-├── libs/parse_req_md.py      # Markdown parsing and element classification
-├── libs/gen_html_doc.py      # HTML generation with interactive features
+├── main.py                    # Application orchestrator and CLI interface with terminal editor
+├── libs/parse_req_md.py      # Markdown parsing and element classification with DATTR support
+├── libs/gen_html_doc.py      # HTML generation with interactive features and DATTR styling
+├── libs/md_edit.py           # In-memory markdown editor for requirement documents
+├── libs/terminal_editor.py   # Interactive terminal-based editor with tab completion
 └── libs/project.py           # Project configuration management
 ```
 
 ### Processing Pipeline
-1. **Input Processing**: Command-line argument parsing and file validation
-2. **Document Parsing**: Markdown content analysis and element classification
-3. **Structure Building**: Hierarchical relationship construction using stack algorithm
-4. **HTML Generation**: Template-based rendering with embedded CSS and JavaScript
-5. **Output Generation**: File writing with proper encoding and error handling
+1. **Input Processing**: Command-line argument parsing and file validation with terminal editor support
+2. **Document Parsing**: Markdown content analysis and element classification including DATTR detection
+3. **Structure Building**: Hierarchical relationship construction using stack algorithm with type alias support
+4. **HTML Generation**: Template-based rendering with embedded CSS, JavaScript, and DATTR styling
+5. **Output Generation**: File writing with proper encoding, error handling, and smart export features
 
 ### Enhanced Documentation
 All core modules now include comprehensive inline documentation covering:
@@ -149,13 +154,16 @@ The system recognizes specific markdown patterns for different element types:
 - Asterisks automatically removed from description
 - Yellow styling in HTML output
 
-#### Data Attributes
+#### Data Attributes (DATTR)
 ```markdown
-&nbsp;&nbsp;&nbsp;&nbsp;1003 Dattr: Created at: <CRAT><br>Modified at: <MODAT>
+&nbsp;&nbsp;&nbsp;&nbsp;1003 Dattr: Created at: 2025-07-27 14:30 Modified at: 2025-07-27 15:45
 ```
-- Format: `{indentation}{number} Dattr: {key-value data}`
-- Used for metadata and structured information
-- Cyan styling with monospace font in HTML output
+- Format: `{indentation}{number} Dattr: {timestamp data}`
+- Used for document metadata and automatic timestamp management
+- **Read-only**: Automatically managed by the editor, cannot be manually edited
+- **Orange/yellow styling**: Light yellow background with orange borders in HTML output
+- **Compact font**: Smaller, bold font for professional appearance
+- **Print optimized**: Colors preserved in print media for consistency
 
 ### Indentation Rules
 - **2 `&nbsp;` entities = 1 indentation level**
@@ -321,6 +329,38 @@ def process_requirements_directory(directory_path):
 # Usage
 process_requirements_directory("requirements_docs/")
 ```
+
+## Terminal Editor Usage
+
+The Requirement Editor includes a powerful interactive terminal interface for real-time document editing:
+
+### Quick Start with Terminal Editor
+```bash
+# Start interactive editor
+python main.py -ed
+
+# Start with existing file
+python main.py -ed requirements.md
+
+# Create new document interactively
+python main.py -ed
+> new
+> edit 1 'My Project Requirements'
+> add after 4 REQUIREMENT 'System shall provide authentication'
+> saveas my_project.md
+> export
+```
+
+### Key Terminal Editor Features
+- **Interactive Editing**: Real-time document manipulation with immediate feedback
+- **Smart Export**: Automatic filename derivation (`export` without filename uses current document name)
+- **DATTR Management**: Automatic timestamp handling with read-only protection
+- **Tab Completion**: File paths, commands, and item types with intelligent suggestions
+- **Type Aliases**: Fast editing with short aliases (TIT, SUB, REQ, COM)
+- **Hierarchical Operations**: Move, add, delete items while maintaining document structure
+- **Search Capabilities**: Find items by text content or ID numbers
+
+For complete terminal editor documentation, see [TERMINAL_EDITOR.md](docs/TERMINAL_EDITOR.md).
 
 ## Configuration and Customization
 

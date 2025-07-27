@@ -123,7 +123,7 @@ Example Output Structure:
 
 Author: Attila Gallai <attila@tux-net.hu>
 Created: 2025-07-09
-Version: 1.0.0
+Version: 1.1.0
 License: MIT License (see LICENSE.txt)
 """
 

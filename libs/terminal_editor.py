@@ -15,7 +15,7 @@ Features:
 
 Author: Attila Gallai <attila@tux-net.hu>
 Created: 2025-07-10
-Version: 1.0.0 - Terminal editor implementation
+Version: 1.1.0 - Terminal editor implementation
 License: MIT License (see LICENSE.txt)
 """
 
@@ -24,6 +24,8 @@ import sys
 import shlex
 import glob
 import re
+import tempfile
+import subprocess
 from typing import Optional, List, Dict, Any
 
 # Try to import readline for tab completion
@@ -72,6 +74,23 @@ class TabCompleter:
     def __init__(self):
         """Initialize the tab completer."""
         self.completion_commands = ['load', 'save', 'saveas', 'export']
+        
+        # Complete list of available commands for command completion
+        self.available_commands = [
+            # File operations
+            'new', 'load', 'save', 'saveas', 'export', 'browse',
+            # Document navigation and display
+            'list', 'refresh', 'mode', 'complete',
+            # Content editing
+            'add', 'edit', 'witheditor', 'delete', 'move', 'type',
+            # Search and navigation
+            'find', 'findid', 'goto',
+            # Project and configuration
+            'project', 'status', 'setstyle', 'clearstyle', 'seteditor', 'cleareditor', 'setbrowser', 'clearbrowser', 'setwindow',
+            # Help and exit
+            'help', 'quit', 'exit'
+        ]
+        
         self.current_matches = []
         
     def complete(self, text, state):
@@ -119,18 +138,26 @@ class TabCompleter:
             
         words = line_buffer.split()
         
-        if not words:
-            return []
+        # If no words or cursor is at the beginning of the line, complete commands
+        if not words or (len(words) == 1 and not line_buffer.endswith(' ')):
+            return self._complete_command(text)
         
+        # If we have a command, check what kind of completion to provide
         command = words[0]
         
-        # Only provide completion for file-related commands
-        if command not in self.completion_commands:
-            return []
+        # For file-related commands, provide filename completion
+        if command in self.completion_commands:
+            # If we're completing the first argument after a file command
+            if len(words) == 1 or (len(words) == 2 and not line_buffer.endswith(' ')):
+                return self._complete_filename(text)
         
-        # If we're completing the first argument after a file command
-        if len(words) == 1 or (len(words) == 2 and not line_buffer.endswith(' ')):
-            return self._complete_filename(text)
+        # For other commands, provide context-specific completion
+        elif command in ['mode']:
+            return self._complete_mode(text)
+        elif command in ['type']:
+            return self._complete_item_type(text)
+        elif command in ['add']:
+            return self._complete_add_args(text, words)
         
         return []
     
@@ -253,8 +280,94 @@ class TabCompleter:
             print()
         else:
             print(f"\n❌ No matches found for '{partial_path}'")
-            print("💡 Try typing a different path or check the current directory")
-            print()
+
+    def _complete_command(self, text):
+        """
+        Complete command names.
+        
+        Args:
+            text (str): Partial command text
+            
+        Returns:
+            list: List of matching commands
+        """
+        matches = []
+        text_lower = text.lower()
+        
+        for command in self.available_commands:
+            if command.startswith(text_lower):
+                matches.append(command)
+        
+        return sorted(matches)
+    
+    def _complete_mode(self, text):
+        """
+        Complete mode arguments for the 'mode' command.
+        
+        Args:
+            text (str): Partial mode text
+            
+        Returns:
+            list: List of matching mode options
+        """
+        modes = ['compact', 'full']
+        matches = []
+        text_lower = text.lower()
+        
+        for mode in modes:
+            if mode.startswith(text_lower):
+                matches.append(mode)
+        
+        return matches
+    
+    def _complete_item_type(self, text):
+        """
+        Complete item type arguments for commands like 'type' and 'add'.
+        
+        Args:
+            text (str): Partial type text
+            
+        Returns:
+            list: List of matching item types
+        """
+        types = ['title', 'subtitle', 'requirement', 'comment', 'dattr']
+        matches = []
+        text_lower = text.lower()
+        
+        for item_type in types:
+            if item_type.startswith(text_lower):
+                matches.append(item_type)
+        
+        return matches
+    
+    def _complete_add_args(self, text, words):
+        """
+        Complete arguments for the 'add' command.
+        
+        Args:
+            text (str): Partial text
+            words (list): All words in the command line
+            
+        Returns:
+            list: List of matching completions
+        """
+        # add [before|after|under] <line_number> <type> <description>
+        if len(words) == 2:  # Completing position argument
+            positions = ['before', 'after', 'under']
+            matches = []
+            text_lower = text.lower()
+            
+            for position in positions:
+                if position.startswith(text_lower):
+                    matches.append(position)
+            
+            return matches
+        
+        elif len(words) == 4:  # Completing type argument
+            return self._complete_item_type(text)
+        
+        return []
+
 
 # Add the libs directory to the path
 sys.path.append(os.path.dirname(__file__))
@@ -336,8 +449,8 @@ class TerminalEditor:
         # Format line number
         line_str = f"{self.colors['line_number']}{line_num:3d}│{Colors.RESET}"
         
-        # Format indentation
-        indent_str = "  " * indent
+        # Format indentation (first level gets no indentation)
+        indent_str = "  " * max(0, indent - 1)
         
         # Format type and ID
         type_color = self._get_type_color(item_type)
@@ -379,17 +492,57 @@ class TerminalEditor:
             print(f"{self.colors['info']}Document is empty.{Colors.RESET}")
             return
         
-        # Determine range
+        # Determine range based on display line numbers (1-based, sequential)
         if end_line is None:
             end_line = len(parts)
         
-        # Display lines
-        for part in parts:
-            line_num = part['line_number']
-            if start_line <= line_num <= end_line:
-                print(self._format_line(part, self.display_mode == "full"))
+        # Ensure valid range
+        start_index = max(0, start_line - 1)  # Convert to 0-based index
+        end_index = min(len(parts), end_line)  # Convert to 0-based index
         
-        print(f"\n{self.colors['info']}Displaying lines {start_line}-{min(end_line, len(parts))} of {len(parts)}{Colors.RESET}")
+        # Display lines using sequential display numbers, not original line numbers
+        for i in range(start_index, end_index):
+            part = parts[i]
+            # Create a copy of the part with display line number for formatting
+            display_part = part.copy()
+            display_part['line_number'] = i + 1  # Sequential display line number
+            print(self._format_line(display_part, self.display_mode == "full"))
+        
+        actual_end = min(end_line, len(parts))
+        print(f"\n{self.colors['info']}Displaying lines {start_line}-{actual_end} of {len(parts)}{Colors.RESET}")
+    
+    def _get_part_by_display_line(self, display_line_number: int) -> Optional[Dict[str, Any]]:
+        """
+        Get a part by its display line number (sequential 1-based).
+        
+        Args:
+            display_line_number: Sequential line number shown in display (1-based)
+            
+        Returns:
+            The part dictionary or None if not found
+        """
+        if not self.md_editor or not self.md_editor.classified_parts:
+            return None
+        
+        # Convert display line number to array index
+        index = display_line_number - 1
+        if 0 <= index < len(self.md_editor.classified_parts):
+            return self.md_editor.classified_parts[index]
+        
+        return None
+    
+    def _get_original_line_number(self, display_line_number: int) -> Optional[int]:
+        """
+        Convert display line number to original file line number.
+        
+        Args:
+            display_line_number: Sequential line number shown in display (1-based)
+            
+        Returns:
+            Original line number from file or None if not found
+        """
+        part = self._get_part_by_display_line(display_line_number)
+        return part['line_number'] if part else None
     
     def _print_help(self):
         """Print help information."""
@@ -401,7 +554,8 @@ class TerminalEditor:
   load <file>                   - Load markdown file
   save                          - Save current document
   saveas <file>                 - Save as new filename
-  export <file>                 - Export to HTML
+  export [file]                 - Export to HTML (uses current doc name if no file specified)
+  browse [file]                 - Export to HTML and open with system default browser
   complete <command> <partial>  - Show file completion options (if TAB unavailable)
   
 {self.colors['subtitle']}✏️  Document Editing:{Colors.RESET}
@@ -413,6 +567,7 @@ class TerminalEditor:
   move <src> under <target>                 - Move item under target
   delete <line>                            - Delete item and children
   edit <line> <new_description>            - Edit description
+  witheditor <line>                        - Edit description using external text editor
   type <line> <new_type> [id]              - Change item type
 
 {self.colors['subtitle']}🔍 Navigation & Search:{Colors.RESET}
@@ -425,9 +580,15 @@ class TerminalEditor:
   mode compact|full             - Set display mode
   refresh                       - Refresh display
   status                        - Show document status
+  indent                        - Check and repair indentation issues
   project                       - Show project configuration
   setstyle <path>               - Set custom stylesheet template path
   clearstyle                    - Clear custom stylesheet (use default)
+  seteditor <path>              - Set external text editor for witheditor command
+  cleareditor                   - Clear custom editor (use system default)
+  setbrowser <path>             - Set web browser for browse command
+  clearbrowser                  - Clear custom browser (use system default)
+  setwindow <name>              - Set browser window name
   
 {self.colors['subtitle']}❓ System:{Colors.RESET}
   help                          - Show this help
@@ -439,7 +600,13 @@ class TerminalEditor:
 
 {self.colors['info']}💡 Tips:{Colors.RESET}
 {self.colors['info']}  • Use line numbers from the display for editing commands{Colors.RESET}
-{self.colors['info']}  • Press TAB for file/directory completion in load/save commands{Colors.RESET}
+{self.colors['info']}  • Press TAB for command completion and file/directory completion{Colors.RESET}
+{self.colors['info']}  • TAB completion works for:{Colors.RESET}
+{self.colors['info']}    - Commands (new, load, save, add, edit, etc.){Colors.RESET}
+{self.colors['info']}    - File paths in load/save/export commands{Colors.RESET}
+{self.colors['info']}    - Mode options (compact, full){Colors.RESET}
+{self.colors['info']}    - Item types (title, subtitle, requirement, comment, dattr){Colors.RESET}
+{self.colors['info']}    - Add command positions (before, after, under){Colors.RESET}
 """
         print(help_text)
     
@@ -598,11 +765,25 @@ class TerminalEditor:
             print(f"{self.colors['error']}❌ Error saving file: {e}{Colors.RESET}")
             return False
     
-    def _export_html(self, filename: str) -> bool:
+    def _export_html(self, filename: str = None) -> bool:
         """Export document to HTML using project configuration if available."""
         if not self.md_editor:
             print(f"{self.colors['error']}❌ No document to export.{Colors.RESET}")
             return False
+        
+        # Handle case when no filename is provided
+        if filename is None:
+            if self.current_file is None:
+                print(f"{self.colors['error']}❌ The file doesn't have a filename yet.{Colors.RESET}")
+                print(f"{self.colors['info']}💡 Use 'saveas <filename>' to save the document first, or{Colors.RESET}")
+                print(f"{self.colors['info']}💡 Use 'export <filename.html>' to specify the HTML filename.{Colors.RESET}")
+                return False
+            else:
+                # Derive HTML filename from current document filename
+                import os
+                base_name = os.path.splitext(self.current_file)[0]
+                filename = f"{base_name}.html"
+                print(f"{self.colors['info']}💡 No filename specified, using: {filename}{Colors.RESET}")
         
         try:
             parts = self.md_editor.get_classified_parts()
@@ -645,28 +826,34 @@ class TerminalEditor:
         
         position = args[0].lower()
         try:
-            line_num = int(args[1])
+            display_line_num = int(args[1])
             item_type = self._normalize_item_type(args[2])
             description = ' '.join(args[3:])
+            
+            # Convert display line number to original line number
+            original_line_num = self._get_original_line_number(display_line_num)
+            if original_line_num is None:
+                print(f"{self.colors['error']}❌ Invalid line number: {display_line_num}{Colors.RESET}")
+                return False
             
             if position == "before":
                 # Generate appropriate ID for items that need it
                 item_id = None
                 if item_type in ['REQUIREMENT', 'COMMENT', 'DATTR']:
                     item_id = self._get_next_available_id()
-                result = self.md_editor.add_item_before(line_num, item_type, description, item_id)
+                result = self.md_editor.add_item_before(original_line_num, item_type, description, item_id)
             elif position == "after":
                 # Generate appropriate ID for items that need it
                 item_id = None
                 if item_type in ['REQUIREMENT', 'COMMENT', 'DATTR']:
                     item_id = self._get_next_available_id()
-                result = self.md_editor.add_item_after(line_num, item_type, description, item_id)
+                result = self.md_editor.add_item_after(original_line_num, item_type, description, item_id)
             elif position == "under":
                 # Generate appropriate ID for items that need it
                 item_id = None
                 if item_type in ['REQUIREMENT', 'COMMENT', 'DATTR']:
                     item_id = self._get_next_available_id()
-                result = self.md_editor.add_item_under(line_num, item_type, description, item_id)
+                result = self.md_editor.add_item_under(original_line_num, item_type, description, item_id)
             else:
                 print(f"{self.colors['error']}❌ Invalid position. Use: before, after, or under{Colors.RESET}")
                 return False
@@ -694,23 +881,34 @@ class TerminalEditor:
             return False
         
         try:
-            src_line = int(args[0])
+            display_src_line = int(args[0])
             position = args[1].lower()
-            target_line = int(args[2])
+            display_target_line = int(args[2])
+            
+            # Convert display line numbers to original line numbers
+            original_src_line = self._get_original_line_number(display_src_line)
+            original_target_line = self._get_original_line_number(display_target_line)
+            
+            if original_src_line is None:
+                print(f"{self.colors['error']}❌ Invalid source line number: {display_src_line}{Colors.RESET}")
+                return False
+            if original_target_line is None:
+                print(f"{self.colors['error']}❌ Invalid target line number: {display_target_line}{Colors.RESET}")
+                return False
             
             if position == "before":
-                success = self.md_editor.move_item_before(src_line, target_line)
+                success = self.md_editor.move_item_before(original_src_line, original_target_line)
             elif position == "after":
-                success = self.md_editor.move_item_after(src_line, target_line)
+                success = self.md_editor.move_item_after(original_src_line, original_target_line)
             elif position == "under":
-                success = self.md_editor.move_item_under(src_line, target_line)
+                success = self.md_editor.move_item_under(original_src_line, original_target_line)
             else:
                 print(f"{self.colors['error']}❌ Invalid position. Use: before, after, or under{Colors.RESET}")
                 return False
             
             if success:
                 self.modified = True
-                print(f"{self.colors['success']}✅ Moved item from line {src_line} {position} line {target_line}{Colors.RESET}")
+                print(f"{self.colors['success']}✅ Moved item from line {display_src_line} {position} line {display_target_line}{Colors.RESET}")
                 return True
             else:
                 print(f"{self.colors['error']}❌ Failed to move item{Colors.RESET}")
@@ -811,6 +1009,24 @@ class TerminalEditor:
             editor_settings = self.project_config.get_editor_settings()
             print(f"  Editor Settings:")
             print(f"    Display Mode:   {editor_settings.get('display_mode', 'compact')}")
+            
+            # Display external editor setting
+            external_editor = self.project_config.get_external_editor_path()
+            if external_editor:
+                print(f"    External Editor: {external_editor}")
+            else:
+                print(f"    External Editor: System default")
+            
+            # Display browser settings
+            browser_settings = self.project_config.get_browser_settings()
+            print(f"  Browser Settings:")
+            
+            # Display browser path setting
+            browser_path = self.project_config.get_browser_path()
+            if browser_path:
+                print(f"    Browser Path:   {browser_path}")
+            else:
+                print(f"    Browser Path:   System default")
         else:
             print(f"{self.colors['warning']}⚠️  No project configuration loaded{Colors.RESET}")
 
@@ -828,7 +1044,14 @@ class TerminalEditor:
             if not args:
                 print(f"{self.colors['error']}❌ Usage: load <filename>{Colors.RESET}")
                 return True
-            self._load_file(args[0])
+            
+            # Process the filename to handle path separators and extensions
+            processed_filename = self._process_filename_for_loading(args[0])
+            if processed_filename:
+                self._load_file(processed_filename)
+            else:
+                print(f"{self.colors['error']}❌ File not found: {args[0]}{Colors.RESET}")
+                print(f"{self.colors['info']}💡 Tip: Make sure the path uses forward slashes (/) or double backslashes (\\\\){Colors.RESET}")
             return True
             
         elif command == "save":
@@ -841,10 +1064,21 @@ class TerminalEditor:
             return self._save_file(args[0])
             
         elif command == "export":
-            if not args:
-                print(f"{self.colors['error']}❌ Usage: export <filename>{Colors.RESET}")
-                return True
-            self._export_html(args[0])
+            if args:
+                # Filename provided
+                self._export_html(args[0])
+            else:
+                # No filename provided - use current document name
+                self._export_html()
+            return True
+        
+        elif command == "browse":
+            if args:
+                # Filename provided
+                self._browse_html(args[0])
+            else:
+                # No filename provided - use current document name
+                self._browse_html()
             return True
             
         elif command == "complete":
@@ -922,11 +1156,18 @@ class TerminalEditor:
                 print(f"{self.colors['error']}❌ Usage: delete <line>{Colors.RESET}")
                 return True
             try:
-                line_num = int(args[0])
-                success = self.md_editor.delete_item(line_num)
+                display_line_num = int(args[0])
+                
+                # Convert display line number to original line number
+                original_line_num = self._get_original_line_number(display_line_num)
+                if original_line_num is None:
+                    print(f"{self.colors['error']}❌ Invalid line number: {display_line_num}{Colors.RESET}")
+                    return True
+                
+                success = self.md_editor.delete_item(original_line_num)
                 if success:
                     self.modified = True
-                    print(f"{self.colors['success']}✅ Deleted item at line {line_num}{Colors.RESET}")
+                    print(f"{self.colors['success']}✅ Deleted item at line {display_line_num}{Colors.RESET}")
                 else:
                     print(f"{self.colors['error']}❌ Failed to delete item{Colors.RESET}")
                 return True
@@ -942,22 +1183,78 @@ class TerminalEditor:
                 print(f"{self.colors['error']}❌ Usage: edit <line> <new_description>{Colors.RESET}")
                 return True
             try:
-                line_num = int(args[0])
+                display_line_num = int(args[0])
+                
+                # Convert display line number to original line number
+                original_line_num = self._get_original_line_number(display_line_num)
+                if original_line_num is None:
+                    print(f"{self.colors['error']}❌ Invalid line number: {display_line_num}{Colors.RESET}")
+                    return True
                 
                 # Check if trying to edit a DATTR item
-                part = self.md_editor._find_part_by_line(line_num)
+                part = self.md_editor._find_part_by_line(original_line_num)
                 if part and part['type'] == 'DATTR':
                     print(f"{self.colors['warning']}⚠️  DATTR items are read-only and managed automatically by the editor.{Colors.RESET}")
                     print(f"{self.colors['info']}💡 Timestamps are updated automatically when saving the document.{Colors.RESET}")
                     return True
                 
                 new_description = ' '.join(args[1:])
-                success = self.md_editor.update_content(line_num, new_description)
+                success = self.md_editor.update_content(original_line_num, new_description)
                 if success:
                     self.modified = True
-                    print(f"{self.colors['success']}✅ Updated item at line {line_num}{Colors.RESET}")
+                    print(f"{self.colors['success']}✅ Updated item at line {display_line_num}{Colors.RESET}")
                 else:
                     print(f"{self.colors['error']}❌ Failed to update item{Colors.RESET}")
+                return True
+            except ValueError as e:
+                print(f"{self.colors['error']}❌ Error: {e}{Colors.RESET}")
+                return True
+        
+        elif command == "witheditor":
+            if not self.md_editor:
+                print(f"{self.colors['error']}❌ No document loaded.{Colors.RESET}")
+                return True
+            if len(args) < 1:
+                print(f"{self.colors['error']}❌ Usage: witheditor <line>{Colors.RESET}")
+                return True
+            try:
+                display_line_num = int(args[0])
+                
+                # Convert display line number to original line number
+                original_line_num = self._get_original_line_number(display_line_num)
+                if original_line_num is None:
+                    print(f"{self.colors['error']}❌ Invalid line number: {display_line_num}{Colors.RESET}")
+                    return True
+                
+                # Check if trying to edit a DATTR item
+                part = self.md_editor._find_part_by_line(original_line_num)
+                if part and part['type'] == 'DATTR':
+                    print(f"{self.colors['warning']}⚠️  DATTR items are read-only and managed automatically by the editor.{Colors.RESET}")
+                    print(f"{self.colors['info']}💡 Timestamps are updated automatically when saving the document.{Colors.RESET}")
+                    return True
+                
+                # Get current content
+                if not part:
+                    print(f"{self.colors['error']}❌ No item found at line {display_line_num}{Colors.RESET}")
+                    return True
+                
+                current_description = part.get('description', '')
+                
+                # Open text editor with current content
+                new_description = self._open_external_editor(current_description)
+                
+                if new_description is not None and new_description != current_description:
+                    success = self.md_editor.update_content(original_line_num, new_description)
+                    if success:
+                        self.modified = True
+                        print(f"{self.colors['success']}✅ Updated item at line {display_line_num} using external editor{Colors.RESET}")
+                    else:
+                        print(f"{self.colors['error']}❌ Failed to update item{Colors.RESET}")
+                elif new_description is None:
+                    print(f"{self.colors['info']}ℹ️  Edit cancelled or editor failed to open{Colors.RESET}")
+                else:
+                    print(f"{self.colors['info']}ℹ️  No changes made{Colors.RESET}")
+                
                 return True
             except ValueError as e:
                 print(f"{self.colors['error']}❌ Error: {e}{Colors.RESET}")
@@ -972,21 +1269,27 @@ class TerminalEditor:
                 print(f"{self.colors['info']}💡 Supported types: TITLE/TIT, SUBTITLE/SUB, REQUIREMENT/REQ, COMMENT/COM, DATTR{Colors.RESET}")
                 return True
             try:
-                line_num = int(args[0])
+                display_line_num = int(args[0])
                 new_type = self._normalize_item_type(args[1])
                 new_id = args[2] if len(args) > 2 else None
                 
+                # Convert display line number to original line number
+                original_line_num = self._get_original_line_number(display_line_num)
+                if original_line_num is None:
+                    print(f"{self.colors['error']}❌ Invalid line number: {display_line_num}{Colors.RESET}")
+                    return True
+                
                 # Check if trying to change DATTR type
-                part = self.md_editor._find_part_by_line(line_num)
+                part = self.md_editor._find_part_by_line(original_line_num)
                 if part and part['type'] == 'DATTR':
                     print(f"{self.colors['warning']}⚠️  DATTR items cannot have their type changed.{Colors.RESET}")
                     print(f"{self.colors['info']}💡 DATTR items are automatically managed by the editor.{Colors.RESET}")
                     return True
                 
-                success = self.md_editor.change_item_type(line_num, new_type, new_id)
+                success = self.md_editor.change_item_type(original_line_num, new_type, new_id)
                 if success:
                     self.modified = True
-                    print(f"{self.colors['success']}✅ Changed item at line {line_num} to {new_type}{Colors.RESET}")
+                    print(f"{self.colors['success']}✅ Changed item at line {display_line_num} to {new_type}{Colors.RESET}")
                 else:
                     print(f"{self.colors['error']}❌ Failed to change item type{Colors.RESET}")
                 return True
@@ -1045,10 +1348,17 @@ class TerminalEditor:
                 print(f"{self.colors['error']}❌ Usage: goto <line>{Colors.RESET}")
                 return False
             try:
-                line_num = int(args[0])
-                part = self.md_editor._find_part_by_line(line_num)
+                display_line_num = int(args[0])
+                
+                # Convert display line number to original line number
+                original_line_num = self._get_original_line_number(display_line_num)
+                if original_line_num is None:
+                    print(f"{self.colors['error']}❌ Invalid line number: {display_line_num}{Colors.RESET}")
+                    return False
+                
+                part = self.md_editor._find_part_by_line(original_line_num)
                 if part:
-                    print(f"{self.colors['success']}✅ Line {line_num} info:{Colors.RESET}")
+                    print(f"{self.colors['success']}✅ Line {display_line_num} info:{Colors.RESET}")
                     print(f"  {self._format_line(part, True)}")
                     
                     # Show parent and children info
@@ -1059,7 +1369,7 @@ class TerminalEditor:
                     if part['children']:
                         print(f"  {self.colors['info']}Children: {part['children']}{Colors.RESET}")
                 else:
-                    print(f"{self.colors['warning']}Line {line_num} not found{Colors.RESET}")
+                    print(f"{self.colors['warning']}Line {display_line_num} not found{Colors.RESET}")
             except ValueError:
                 print(f"{self.colors['error']}❌ Invalid line number{Colors.RESET}")
             return True
@@ -1083,6 +1393,43 @@ class TerminalEditor:
                     print(f"    {color}{item_type}: {count}{Colors.RESET}")
             else:
                 print(f"{self.colors['warning']}No document loaded{Colors.RESET}")
+            return True
+        
+        elif command == "indent":
+            if not self.md_editor:
+                print(f"{self.colors['error']}❌ No document loaded.{Colors.RESET}")
+                return True
+                
+            print(f"{self.colors['info']}🔧 Analyzing document indentation...{Colors.RESET}")
+            
+            # Perform indentation repair
+            result = self.md_editor.repair_indentation()
+            
+            if result['success']:
+                if result['fixed_count'] > 0:
+                    self.modified = True
+                    print(f"{self.colors['success']}✅ Fixed {result['fixed_count']} indentation issues:{Colors.RESET}")
+                    for fix in result['fixes']:
+                        print(f"  {self.colors['info']}• {fix}{Colors.RESET}")
+                else:
+                    print(f"{self.colors['success']}✅ Document indentation is already correct - no fixes needed.{Colors.RESET}")
+                
+                # Show warnings if any
+                if result['warnings']:
+                    print(f"\n{self.colors['warning']}⚠️  Warnings:{Colors.RESET}")
+                    for warning in result['warnings']:
+                        print(f"  {self.colors['warning']}• {warning}{Colors.RESET}")
+                
+                # Show updated document structure if fixes were made
+                if result['fixed_count'] > 0:
+                    print(f"\n{self.colors['info']}📋 Updated document structure:{Colors.RESET}")
+                    self.display_document()
+            else:
+                print(f"{self.colors['error']}❌ Indentation repair failed.{Colors.RESET}")
+                if result['warnings']:
+                    for warning in result['warnings']:
+                        print(f"  {self.colors['error']}• {warning}{Colors.RESET}")
+            
             return True
         
         elif command == "project":
@@ -1116,6 +1463,79 @@ class TerminalEditor:
                     print(f"{self.colors['error']}❌ Failed to save project configuration{Colors.RESET}")
             else:
                 print(f"{self.colors['warning']}⚠️  No project configuration loaded. Save the document first.{Colors.RESET}")
+            return True
+        
+        elif command == "seteditor":
+            if not args:
+                print(f"{self.colors['error']}❌ Usage: seteditor <path>{Colors.RESET}")
+            else:
+                editor_path = args[0]
+                if os.path.exists(editor_path):
+                    if self.project_config:
+                        self.project_config.set_external_editor_path(editor_path)
+                        if self.project_config.save_project():
+                            print(f"{self.colors['success']}✅ External editor set to: {editor_path}{Colors.RESET}")
+                        else:
+                            print(f"{self.colors['error']}❌ Failed to save project configuration{Colors.RESET}")
+                    else:
+                        print(f"{self.colors['warning']}⚠️  No project configuration loaded. Save the document first.{Colors.RESET}")
+                else:
+                    print(f"{self.colors['error']}❌ Editor executable not found: {editor_path}{Colors.RESET}")
+            return True
+        
+        elif command == "cleareditor":
+            if self.project_config:
+                self.project_config.set_external_editor_path(None)
+                if self.project_config.save_project():
+                    print(f"{self.colors['success']}✅ External editor cleared (using system default){Colors.RESET}")
+                else:
+                    print(f"{self.colors['error']}❌ Failed to save project configuration{Colors.RESET}")
+            else:
+                print(f"{self.colors['warning']}⚠️  No project configuration loaded. Save the document first.{Colors.RESET}")
+            return True
+        
+        elif command == "setbrowser":
+            if not args:
+                print(f"{self.colors['error']}❌ Usage: setbrowser <path>{Colors.RESET}")
+            else:
+                browser_path = args[0]
+                if os.path.exists(browser_path):
+                    if self.project_config:
+                        self.project_config.set_browser_path(browser_path)
+                        if self.project_config.save_project():
+                            print(f"{self.colors['success']}✅ Web browser set to: {browser_path}{Colors.RESET}")
+                        else:
+                            print(f"{self.colors['error']}❌ Failed to save project configuration{Colors.RESET}")
+                    else:
+                        print(f"{self.colors['warning']}⚠️  No project configuration loaded. Save the document first.{Colors.RESET}")
+                else:
+                    print(f"{self.colors['error']}❌ Browser executable not found: {browser_path}{Colors.RESET}")
+            return True
+        
+        elif command == "clearbrowser":
+            if self.project_config:
+                self.project_config.set_browser_path(None)
+                if self.project_config.save_project():
+                    print(f"{self.colors['success']}✅ Web browser cleared (using system default){Colors.RESET}")
+                else:
+                    print(f"{self.colors['error']}❌ Failed to save project configuration{Colors.RESET}")
+            else:
+                print(f"{self.colors['warning']}⚠️  No project configuration loaded. Save the document first.{Colors.RESET}")
+            return True
+        
+        elif command == "setwindow":
+            if not args:
+                print(f"{self.colors['error']}❌ Usage: setwindow <name>{Colors.RESET}")
+            else:
+                window_name = ' '.join(args)  # Allow window names with spaces
+                if self.project_config:
+                    self.project_config.set_browser_window_name(window_name)
+                    if self.project_config.save_project():
+                        print(f"{self.colors['success']}✅ Browser window name set to: {window_name}{Colors.RESET}")
+                    else:
+                        print(f"{self.colors['error']}❌ Failed to save project configuration{Colors.RESET}")
+                else:
+                    print(f"{self.colors['warning']}⚠️  No project configuration loaded. Save the document first.{Colors.RESET}")
             return True
             
         elif command == "help":
@@ -1163,14 +1583,21 @@ class TerminalEditor:
                 
                 # Parse command and arguments
                 try:
-                    parts = shlex.split(user_input)
+                    # On Windows, use simple split to avoid shlex issues with backslashes
+                    if os.name == 'nt':  # Windows
+                        parts = user_input.split()
+                    else:
+                        parts = shlex.split(user_input)
                     command = parts[0]
                     args = parts[1:]
-                except ValueError:
-                    # Fallback for quote parsing issues
+                except (ValueError, IndexError):
+                    # Fallback for any parsing issues
                     parts = user_input.split()
-                    command = parts[0]
-                    args = parts[1:]
+                    if parts:
+                        command = parts[0]
+                        args = parts[1:]
+                    else:
+                        continue
                 
                 # Process command
                 continue_loop = self._process_command(command, args)
@@ -1377,6 +1804,165 @@ class TerminalEditor:
             next_id += 1
         
         return next_id
+    
+    def _open_external_editor(self, initial_content: str) -> Optional[str]:
+        """
+        Open external text editor for editing content.
+        
+        Creates a temporary file with the initial content, opens the configured
+        text editor (or system default if none configured), and returns the 
+        modified content after the editor is closed.
+        
+        Args:
+            initial_content: The initial text to put in the editor
+            
+        Returns:
+            The modified content if successful, None if cancelled or failed
+        """
+        try:
+            # Create a temporary file
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, encoding='utf-8') as temp_file:
+                temp_file.write(initial_content)
+                temp_filename = temp_file.name
+            
+            print(f"{self.colors['info']}📝 Opening external editor...{Colors.RESET}")
+            
+            # Get configured external editor path from project settings
+            configured_editor = None
+            if self.project_config:
+                configured_editor = self.project_config.get_external_editor_path()
+            
+            try:
+                if configured_editor:
+                    # Use the configured external editor
+                    print(f"{self.colors['info']}💡 Using configured editor: {configured_editor}{Colors.RESET}")
+                    print(f"{self.colors['info']}💡 Edit the text, save, and close the editor to continue{Colors.RESET}")
+                    
+                    # Check if the configured editor exists
+                    if not os.path.exists(configured_editor):
+                        print(f"{self.colors['warning']}⚠️  Configured editor not found: {configured_editor}{Colors.RESET}")
+                        print(f"{self.colors['info']}💡 Falling back to system default editor{Colors.RESET}")
+                        configured_editor = None
+                    else:
+                        result = subprocess.run([configured_editor, temp_filename], check=True)
+                
+                if not configured_editor:
+                    # Use system default editor
+                    print(f"{self.colors['info']}💡 Using system default editor{Colors.RESET}")
+                    print(f"{self.colors['info']}💡 Edit the text, save, and close the editor to continue{Colors.RESET}")
+                    
+                    # On Windows, use the default text editor
+                    if os.name == 'nt':  # Windows
+                        # Try notepad first, then try the default editor
+                        try:
+                            result = subprocess.run(['notepad.exe', temp_filename], check=True)
+                        except (subprocess.CalledProcessError, FileNotFoundError):
+                            # Fallback to start command which uses default program
+                            result = subprocess.run(['cmd', '/c', 'start', '/wait', temp_filename], check=True)
+                    else:
+                        # On Unix-like systems, try common editors
+                        editor = os.environ.get('EDITOR', 'nano')  # Default to nano if no EDITOR set
+                        result = subprocess.run([editor, temp_filename], check=True)
+                
+                # Read the modified content
+                with open(temp_filename, 'r', encoding='utf-8') as temp_file:
+                    modified_content = temp_file.read().strip()
+                
+                return modified_content
+                
+            except subprocess.CalledProcessError as e:
+                print(f"{self.colors['error']}❌ Editor process failed: {e}{Colors.RESET}")
+                return None
+            except FileNotFoundError as e:
+                print(f"{self.colors['error']}❌ Editor not found: {e}{Colors.RESET}")
+                return None
+                
+        except Exception as e:
+            print(f"{self.colors['error']}❌ Failed to create temporary file: {e}{Colors.RESET}")
+            return None
+        finally:
+            # Clean up the temporary file
+            try:
+                if 'temp_filename' in locals():
+                    os.unlink(temp_filename)
+            except Exception:
+                pass  # Ignore cleanup errors
+
+    def _open_html_in_browser(self, html_file: str) -> bool:
+        """
+        Open HTML file with system default web browser.
+        
+        Args:
+            html_file: Path to the HTML file to open
+            
+        Returns:
+            True if browser opened successfully, False otherwise
+        """
+        try:
+            # Convert relative path to absolute path
+            abs_html_file = os.path.abspath(html_file)
+            
+            # Check if file exists
+            if not os.path.exists(abs_html_file):
+                print(f"{self.colors['error']}❌ HTML file not found: {abs_html_file}{Colors.RESET}")
+                return False
+            
+            print(f"{self.colors['info']}🌐 Opening HTML file with system default browser...{Colors.RESET}")
+            print(f"{self.colors['info']}� File: {abs_html_file}{Colors.RESET}")
+            
+            # Use system default browser directly
+            if os.name == 'nt':  # Windows
+                # Use os.startfile to open with default browser without command window
+                os.startfile(abs_html_file)
+            elif os.name == 'posix':  # Unix/Linux/macOS
+                if sys.platform == 'darwin':  # macOS
+                    subprocess.run(['open', abs_html_file], check=True)
+                else:  # Linux
+                    subprocess.run(['xdg-open', abs_html_file], check=True)
+            else:
+                # Fallback using webbrowser module
+                import webbrowser
+                webbrowser.open('file://' + abs_html_file)
+            
+            print(f"{self.colors['success']}✅ HTML file opened in default browser{Colors.RESET}")
+            return True
+                
+        except subprocess.CalledProcessError as e:
+            print(f"{self.colors['error']}❌ Failed to open browser: {e}{Colors.RESET}")
+            return False
+        except Exception as e:
+            print(f"{self.colors['error']}❌ Error opening browser: {e}{Colors.RESET}")
+            return False
+    
+    def _browse_html(self, filename: str = None) -> bool:
+        """
+        Export document to HTML and open with system default web browser.
+        
+        Args:
+            filename: Optional HTML filename. If not provided, uses document name.
+            
+        Returns:
+            True if export and browser opening successful, False otherwise
+        """
+        # First export to HTML
+        if self._export_html(filename):
+            # Determine the HTML filename that was created
+            if filename:
+                html_file = filename
+            else:
+                # Use the current document name to determine HTML filename
+                if self.current_file:
+                    base_name = os.path.splitext(self.current_file)[0]
+                    html_file = f"{base_name}.html"
+                else:
+                    print(f"{self.colors['error']}❌ No filename specified and no current document loaded.{Colors.RESET}")
+                    return False
+            
+            # Open with system default browser
+            return self._open_html_in_browser(html_file)
+        else:
+            print(f"{self.colors['error']}❌ Failed to export HTML file for browsing.{Colors.RESET}")
+            return False
 
 def main():
     """Main entry point for the terminal editor."""

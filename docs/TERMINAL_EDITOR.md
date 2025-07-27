@@ -39,7 +39,7 @@ python main.py -ed test/data/test_input.md
 | `load <file>` | Load markdown file | `load requirements.md` |
 | `save` | Save current document ⚠️ | `save` |
 | `saveas <file>` | Save as new filename | `saveas new_reqs.md` |
-| `export <file>` | Export to HTML | `export output.html` |
+| `export [file]` | Export to HTML | `export` or `export output.html` |
 
 ⚠️ **Important**: After creating a new document with `new`, you must use `saveas <filename>` for the first save since no filename is set yet. The `save` command will show an error message but won't exit the program.
 
@@ -64,6 +64,16 @@ python main.py -ed test/data/test_input.md
 
 **DATTR Management**: DATTR items contain creation and modification timestamps in the format "Created at: YYYY-MM-DD HH:MM Modified at: YYYY-MM-DD HH:MM". These are automatically updated by the editor and cannot be modified by users.
 
+**Export Functionality**: The `export` command provides flexible HTML export options:
+
+- **Smart filename**: When used without a filename, automatically uses the current document name with `.html` extension
+  - Example: If current document is `requirements.md`, `export` creates `requirements.html`
+- **Custom filename**: When provided with a filename, uses the specified name
+  - Example: `export custom_output.html` creates `custom_output.html`
+- **New document handling**: For unsaved documents, provides helpful guidance to save first or specify a filename
+  - Shows error: "The file doesn't have a filename yet" with suggestions
+- **Backward compatible**: All existing export workflows continue to work
+
 ### ✏️ Document Editing
 
 | Command | Description | Example |
@@ -76,6 +86,7 @@ python main.py -ed test/data/test_input.md
 | `move <src> under <target>` | Move item under target | `move 5 under 3` |
 | `delete <line>` | Delete item and children | `delete 7` |
 | `edit <line> <description>` | Edit description | `edit 4 'Updated requirement text'` |
+| `witheditor <line>` | Edit description with external editor | `witheditor 4` |
 | `type <line> <type>` | Change item type | `type 5 COMMENT` |
 
 ### 🔍 Navigation & Search
@@ -188,6 +199,20 @@ load project_specs.md
 - Text search across all descriptions
 - ID-based lookup for numbered items
 - Case-insensitive search by default
+
+### External Editor Integration
+- **`witheditor <line>`**: Opens system text editor for editing descriptions
+- **Perfect for long text**: Multi-line editing with full editor features
+- **Cross-platform**: Works on Windows (Notepad) and Unix-like systems (nano/$EDITOR)
+- **Safe operation**: Uses temporary files with automatic cleanup
+- **UTF-8 support**: Full international character support
+- **DATTR protection**: Prevents editing of read-only timestamp items
+
+**Usage Examples:**
+```bash
+witheditor 4                    # Edit requirement #4 in external editor
+witheditor 7                    # Edit comment #7 with full editor features
+```
 
 ## 🏃‍♂️ Quick Start Example
 

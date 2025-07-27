@@ -7,13 +7,19 @@ This directory contains all test files and test data for the Requirement Editor 
 ```
 test/
 ├── test_runner.py              # Automated test discovery and execution
-├── test_comprehensive.py       # Comprehensive integration tests
+├── test_comprehensive.py       # Comprehensive integration tests with DATTR and export features
 ├── test_project_config.py      # Tests for project configuration module
 ├── test_simple.py              # Simple unit tests for basic functionality
 ├── test_stylesheet_config.py   # Tests for stylesheet configuration system
 ├── test_reporter.py            # HTML test report generator
 ├── test_md_edit_line_based.py  # Comprehensive tests for md_edit.py module
 ├── test_md_edit_integration.py # Integration tests for md_edit.py with real data
+├── test_terminal_config_location.py # Terminal editor configuration tests
+├── test_tab_completion.py      # Tab completion functionality tests
+├── test_saveas_integration.py  # Save-as functionality and filename processing tests
+├── test_encoding_fix.py        # Encoding handling and file processing tests
+├── test_id_fix.py              # Integer ID system and DATTR tests
+├── test_practical_demo.py      # Practical usage scenarios and demo tests
 ├── results/                    # Test execution results and reports
 └── data/
     ├── test_input.md           # Sample markdown requirement document
