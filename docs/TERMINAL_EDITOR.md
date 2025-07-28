@@ -10,10 +10,17 @@ The Requirement Editor now includes a powerful terminal-based interface for inte
 # Start with new document
 python main.py -ed
 
-# Start and load existing file
-python main.py -ed requirements.md
-python main.py -ed test/data/test_input.md
+# Start and load existing file (automatic .md extension)
+python main.py -ed requirements          # Finds requirements.md automatically
+python main.py -ed test/data/test_input  # Finds test_input.md automatically
+python main.py -ed requirements.md       # Direct file specification
 ```
+
+### Automatic File Extension Handling
+The terminal editor automatically tries adding `.md` extension when files are not found:
+- `python main.py -ed requirements` → looks for `requirements.md`
+- `python main.py -ed specs.txt` → looks for `specs.md` if `specs.txt` doesn't exist
+- Provides helpful feedback when files are found with automatic extension
 
 ### First Time Usage
 
@@ -36,7 +43,7 @@ python main.py -ed test/data/test_input.md
 | Command | Description | Example |
 |---------|-------------|---------|
 | `new` | Create new document with default structure | `new` |
-| `load <file>` | Load markdown file | `load requirements.md` |
+| `load <file>` | Load markdown file (automatic .md extension) | `load requirements` or `load requirements.md` |
 | `save` | Save current document ⚠️ | `save` |
 | `saveas <file>` | Save as new filename | `saveas new_reqs.md` |
 | `export [file]` | Export to HTML | `export` or `export output.html` |

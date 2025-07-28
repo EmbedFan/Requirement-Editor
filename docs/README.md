@@ -57,7 +57,8 @@ python/
 │   ├── parse_req_md.md       # parse_req_md.py documentation
 │   ├── gen_html_doc.md       # gen_html_doc.py documentation
 │   ├── project.md            # project.py documentation
-│   └── TERMINAL_EDITOR.md    # Terminal editor documentation and usage guide
+│   ├── TERMINAL_EDITOR.md    # Terminal editor documentation and usage guide
+│   └── AUTO_MD_EXTENSION_FEATURE.md # Automatic .md extension feature documentation
 └── LICENSE                   # MIT License file
 ```
 
@@ -68,15 +69,26 @@ python/
 3. **Execution**: 
    - Standard processing: `python main.py`
    - Interactive terminal editor: `python main.py -ed` (⭐ **Recommended for beginners**)
-   - Load existing file in editor: `python main.py -ed requirements.md`
+   - Load existing file in editor: `python main.py -ed requirements` (automatic .md extension)
+   - Convert specific file: `python main.py -md2html specs` (finds specs.md automatically)
 4. **Output**: HTML file generated with same name as input but `.html` extension
 5. **Testing**: Run `python test/test_runner.py` to execute all tests
 6. **Demo**: Run `python examples/demo_terminal_editor.py` to see terminal editor capabilities
+
+### Automatic File Extension Handling
+The system automatically tries adding `.md` extension when files are not found:
+- `python main.py -ed requirements` → looks for `requirements.md`
+- `python main.py -md2html specs` → looks for `specs.md`
+- Works with both relative and absolute paths
+- Provides helpful feedback when files are found with automatic extension
 
 ### Terminal Editor Quick Start
 ```bash
 # Start interactive editor (recommended for new users)
 python main.py -ed
+
+# Load existing file (automatic .md extension)
+python main.py -ed requirements          # Finds requirements.md automatically
 
 # In the editor:
 > new                                    # Create new document

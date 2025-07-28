@@ -14,6 +14,7 @@ The Requirement Editor is a sophisticated Python-based tool for converting markd
 - **Interactive HTML Generation**: Professional web documents with expand/collapse functionality and DATTR field styling
 - **Modern Web Features**: Responsive design, print optimization, accessibility support, and orange/yellow DATTR styling
 - **Terminal Editor Interface**: Interactive command-line editor with real-time document visualization and smart export
+- **Automatic File Extension Handling**: Smart `.md` extension addition for convenient file loading without extensions
 - **Tab Completion Support**: Smart file/directory completion for efficient navigation across all commands
 - **Type Aliases**: Fast editing with short aliases (TIT, SUB, REQ, COM) for improved productivity
 - **DATTR Management**: Automatic timestamp handling with read-only protection and visual styling
@@ -343,8 +344,9 @@ The Requirement Editor includes a powerful interactive terminal interface for re
 # Start interactive editor
 python main.py -ed
 
-# Start with existing file
-python main.py -ed requirements.md
+# Start with existing file (automatic .md extension)
+python main.py -ed requirements          # Finds requirements.md automatically
+python main.py -ed requirements.md       # Direct file specification
 
 # Create new document interactively
 python main.py -ed
@@ -354,6 +356,35 @@ python main.py -ed
 > saveas my_project.md
 > export
 ```
+
+### Command Line Interface
+```bash
+# Basic HTML conversion (automatic .md extension)
+python main.py -md2html requirements     # Finds requirements.md automatically
+python main.py -md2html specs            # Finds specs.md automatically
+python main.py -md2html project.txt      # Finds project.md if project.txt doesn't exist
+
+# Direct file specification
+python main.py -md2html requirements.md  # Use exact filename
+python main.py -md2html "C:\Documents\specs.md"
+
+# Interactive terminal editor
+python main.py -ed                       # Start with new document
+python main.py -ed requirements          # Load requirements.md automatically
+
+# Help and information
+python main.py -h                        # Show detailed help
+```
+
+### Automatic File Extension Handling
+The system now automatically tries adding `.md` extension when files are not found:
+
+- **No Extension**: `requirements` → looks for `requirements.md`
+- **Wrong Extension**: `requirements.txt` → looks for `requirements.md` 
+- **Exact Match**: `requirements.md` → uses file as specified
+- **Not Found**: Shows helpful error with alternatives tried
+
+This feature works for both `-md2html` and `-ed` commands, making file loading more convenient.
 
 ### Key Terminal Editor Features
 - **Interactive Editing**: Real-time document manipulation with immediate feedback
@@ -761,11 +792,17 @@ This project is the intellectual property of Attila Gallai <attila@tux-net.hu>. 
 
 ### Essential Commands
 ```bash
-# Basic usage
-python main.py
+# Basic HTML conversion (automatic .md extension)
+python main.py -md2html requirements     # Finds requirements.md automatically
+python main.py -md2html specs            # Finds specs.md automatically
 
 # Interactive terminal editor
-python main.py -ed
+python main.py -ed                       # Start with new document
+python main.py -ed requirements          # Load requirements.md automatically
+
+# Help and verification
+python main.py -h                        # Show detailed help
+python main.py                          # Process default test file
 
 # Check Python version
 python --version

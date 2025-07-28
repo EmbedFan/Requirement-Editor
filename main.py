@@ -143,6 +143,40 @@ def SaveHTMLFile(html_content, filename):
         return False
 
 
+def process_filename_for_loading(filename):
+    """
+    Process filename for loading - automatically try .md extension if file not found.
+    
+    Args:
+        filename (str): The original filename provided by user
+        
+    Returns:
+        str: Valid filename that exists, or None if no valid file found
+    """
+    # First, try the filename as provided
+    if os.path.exists(filename):
+        return filename
+    
+    # If the file doesn't exist, check if it needs .md extension
+    name, ext = os.path.splitext(filename)
+    
+    if not ext:
+        # No extension - try adding .md
+        md_filename = f"{filename}.md"
+        if os.path.exists(md_filename):
+            print(f"Info: File found with .md extension: {md_filename}")
+            return md_filename
+    elif ext.lower() != '.md':
+        # Different extension - try changing to .md
+        md_filename = f"{name}.md"
+        if os.path.exists(md_filename):
+            print(f"Info: Found .md version: {md_filename}")
+            return md_filename
+    
+    # If we get here, no valid file was found
+    return None
+
+
 def show_help():
     """
     Display help information and usage examples for the command line interface.
@@ -157,6 +191,7 @@ def show_help():
     print("DESCRIPTION:")
     print("  Converts markdown-formatted requirement documents into interactive,")
     print("  styled HTML documents with hierarchical organization and modern web features.")
+    print("  Automatically tries adding .md extension if file is not found.")
     print()
     print("USAGE:")
     print("  python main.py                           # Use default input file")
@@ -167,16 +202,19 @@ def show_help():
     print("COMMAND LINE OPTIONS:")
     print("  -h                     Show help information and usage examples")
     print("  -md2html <filepath>     Convert specified markdown file to HTML")
+    print("                         (automatically tries .md extension if file not found)")
     print("  -ed [filepath]         Start terminal-based interactive editor")
+    print("                         (automatically tries .md extension if file not found)")
     print()
     print("EXAMPLES:")
-    print("  python main.py -md2html requirements.md")
-    print("  python main.py -md2html \"C:\\\\Documents\\\\specs.md\"")
+    print("  python main.py -md2html requirements     # Finds requirements.md automatically")
+    print("  python main.py -md2html requirements.md  # Direct file specification")
+    print("  python main.py -md2html \"C:\\\\Documents\\\\specs\"  # Finds specs.md automatically")
     print("  python main.py -ed                       # Start editor with new document")
-    print("  python main.py -ed requirements.md       # Start editor and load file")
-    print("  python main.py -md2html ../project/requirements.md")
-    print("  python main.py -md2html test_input.md")
-    print("  python main.py -md2html example.md")
+    print("  python main.py -ed requirements          # Finds and loads requirements.md")
+    print("  python main.py -md2html ../project/requirements")
+    print("  python main.py -md2html test_input")
+    print("  python main.py -md2html example")
     print()
     print("OUTPUT:")
     print("  - HTML file is created with same name as input file but .html extension")
@@ -272,19 +310,19 @@ def process_command_line():
         
         input_file = args[1]
         
-        # Validate file exists
-        if not os.path.exists(input_file):
+        # Try to find the file (with automatic .md extension if needed)
+        processed_file = process_filename_for_loading(input_file)
+        
+        if processed_file:
+            return processed_file
+        else:
+            # No valid file found
             print(f"Error: Input file not found: {input_file}")
+            if not input_file.endswith('.md'):
+                print(f"Also tried: {input_file}.md")
             print()
             print("Use 'python main.py -h' for help information.")
             sys.exit(1)  # Error exit for missing file
-        
-        # Validate file extension
-        if not input_file.lower().endswith('.md'):
-            print(f"Warning: Input file does not have .md extension: {input_file}")
-            print("Proceeding anyway...")
-        
-        return input_file
     
     # Invalid arguments
     print("Error: Invalid command line arguments.")

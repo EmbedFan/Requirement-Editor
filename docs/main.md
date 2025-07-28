@@ -82,9 +82,35 @@ Modify this variable to change the input markdown file path.
 
 ## Usage
 
+### Basic Usage
 ```bash
+# Use default input file
 python main.py
+
+# Convert specific file (automatic .md extension)
+python main.py -md2html requirements     # Finds requirements.md automatically
+python main.py -md2html specs            # Finds specs.md automatically
+
+# Direct file specification
+python main.py -md2html requirements.md  # Use exact filename
+
+# Interactive terminal editor
+python main.py -ed                       # Start with new document
+python main.py -ed requirements          # Load requirements.md automatically
+
+# Help information
+python main.py -h                        # Show detailed help
 ```
+
+### Automatic File Extension Handling
+The system includes smart file loading that automatically tries adding `.md` extension:
+
+- **No Extension**: `requirements` → automatically tries `requirements.md`
+- **Wrong Extension**: `requirements.txt` → tries `requirements.md` if `.txt` doesn't exist
+- **Exact Match**: `requirements.md` → uses file as specified
+- **Error Handling**: Shows helpful messages when files cannot be found
+
+This feature works for both `-md2html` and `-ed` commands, implemented via the `process_filename_for_loading()` function.
 
 ## Dependencies
 
@@ -92,6 +118,26 @@ python main.py
 - `libs.gen_html_doc`: HTML generation and styling functionality
 
 ## Functions
+
+### process_filename_for_loading(filename)
+**Purpose:** Automatically tries adding `.md` extension if file not found
+
+**Parameters:**
+- `filename` (str): The original filename provided by user
+
+**Returns:**
+- `str`: Valid filename that exists
+- `None`: If no valid file found
+
+**Logic:**
+1. First tries the filename exactly as provided
+2. If no extension provided, tries adding `.md`
+3. If different extension provided, tries replacing with `.md`
+4. Returns `None` if no valid file found
+
+**Console Output:**
+- "Info: File found with .md extension: {filename}" when extension added
+- "Info: Found .md version: {filename}" when extension replaced
 
 ### SaveHTMLFile(html_content, filename)
 **Features:**
