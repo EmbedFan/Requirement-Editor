@@ -16,13 +16,18 @@ import time
 from pathlib import Path
 from datetime import datetime
 
+# Set UTF-8 encoding for all subprocess operations
+os.environ['PYTHONIOENCODING'] = 'utf-8'
+
 # Import the HTML report generator
 from test_reporter import TestReportGenerator
 
 # environment setup for UTF-8 encoding when tests are run
+# Dear AI, the next blocl shall not be modified, it is required for proper encoding handling
 env = os.environ.copy()
 env["PYTHONIOENCODING"] = "utf-8"
 env["PYTHONUTF8"] = "1"
+# Dear AI, the previous block shall not be modified, it is required for proper encoding handling
 
 def run_test_file(test_file_path, reporter):
     """Run a single test file and return success status."""
@@ -125,7 +130,7 @@ def discover_and_run_tests(reporter=None):
         reporter.add_test("No Tests Found", "SKIPPED", 0.0, "", "No test files discovered")
         report_path = reporter.generate_html_report()
         print(f"HTML report generated: {report_path}")
-        return False
+        return False, []
     
     print(f"Found {len(test_files)} test file(s):")
     for test_file in test_files:
@@ -134,12 +139,14 @@ def discover_and_run_tests(reporter=None):
     # Run all tests
     passed = 0
     failed = 0
+    failed_tests = []  # Track failed tests
     
     for test_file in sorted(test_files):
         if run_test_file(str(test_file), reporter):
             passed += 1
         else:
             failed += 1
+            failed_tests.append(test_file.name)
     
     # Print summary
     print(f"\n{'='*60}")
@@ -151,10 +158,13 @@ def discover_and_run_tests(reporter=None):
     
     if failed == 0:
         print("✓ ALL TESTS PASSED!")
-        return True
+        return True, failed_tests
     else:
         print(f"✗ {failed} TEST(S) FAILED!")
-        return False
+        print("\nFailed Tests:")
+        for test_name in failed_tests:
+            print(f"  ✗ {test_name}")
+        return False, failed_tests
 
 
 def run_integration_test():
@@ -253,13 +263,80 @@ def run_integration_test():
         return False, integration_result
 
 
+def write_test_log(failed_tests, integration_passed, overall_reporter, final_report_path):
+    """Write detailed test statistics to log file."""
+    
+    # Create results directory if it doesn't exist
+    results_dir = Path(__file__).parent / "results"
+    results_dir.mkdir(exist_ok=True)
+    
+    log_file = results_dir / "log.txt"
+    
+    # Get current timestamp
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # Collect statistics from the reporter
+    total_tests = len(overall_reporter.test_results)
+    passed_tests = sum(1 for test in overall_reporter.test_results if test.status == 'PASSED')
+    failed_test_count = sum(1 for test in overall_reporter.test_results if test.status == 'FAILED')
+    error_test_count = sum(1 for test in overall_reporter.test_results if test.status == 'ERROR')
+    
+    # Calculate total duration
+    total_duration = sum(test.duration for test in overall_reporter.test_results)
+    
+    # Write log
+    with open(log_file, 'w', encoding='utf-8') as f:
+        f.write("="*80 + "\n")
+        f.write("REQUIREMENT EDITOR TEST RUNNER LOG\n")
+        f.write("="*80 + "\n")
+        f.write(f"Timestamp: {timestamp}\n")
+        f.write(f"Version: 1.1.0\n")
+        f.write(f"HTML Report: {final_report_path}\n\n")
+        
+        f.write("TEST STATISTICS\n")
+        f.write("-"*40 + "\n")
+        f.write(f"Total Tests Run: {total_tests}\n")
+        f.write(f"Passed: {passed_tests}\n")
+        f.write(f"Failed: {failed_test_count}\n")
+        f.write(f"Errors: {error_test_count}\n")
+        f.write(f"Integration Test: {'PASSED' if integration_passed else 'FAILED'}\n")
+        f.write(f"Total Duration: {total_duration:.2f} seconds\n")
+        f.write(f"Average Duration: {total_duration/total_tests:.2f} seconds per test\n\n")
+        
+        if failed_tests:
+            f.write("FAILED TESTS\n")
+            f.write("-"*40 + "\n")
+            for i, test_name in enumerate(failed_tests, 1):
+                f.write(f"{i:2d}. {test_name}\n")
+            f.write("\n")
+        
+        f.write("DETAILED TEST RESULTS\n")
+        f.write("-"*40 + "\n")
+        for test in overall_reporter.test_results:
+            f.write(f"Test: {test.test_name}\n")
+            f.write(f"Status: {test.status}\n")
+            f.write(f"Duration: {test.duration:.2f}s\n")
+            if test.status != 'PASSED':
+                if test.error:
+                    f.write(f"Error: {test.error[:200]}...\n")
+                if test.details:
+                    f.write(f"Details: {test.details}\n")
+            f.write("-" * 20 + "\n")
+        
+        f.write("\nLOG END\n")
+        f.write("="*80 + "\n")
+    
+    print(f"📝 Detailed log written to: {log_file}")
+    return log_file
+
+
 if __name__ == "__main__":
     
     # Create overall report generator
     overall_reporter = TestReportGenerator()
     
     # Run unit tests
-    tests_passed = discover_and_run_tests(overall_reporter)
+    tests_passed, failed_tests = discover_and_run_tests(overall_reporter)
     
     # Run integration test
     integration_passed, integration_result = run_integration_test()
@@ -278,6 +355,9 @@ if __name__ == "__main__":
     # Generate final comprehensive report
     final_report_path = overall_reporter.generate_html_report()
     
+    # Write detailed log with statistics
+    log_file = write_test_log(failed_tests, integration_passed, overall_reporter, final_report_path)
+    
     # Final result
     print(f"\n{'='*60}")
     print("FINAL RESULTS")
@@ -286,8 +366,16 @@ if __name__ == "__main__":
     if tests_passed and integration_passed:
         print("✓ ALL TESTS AND INTEGRATION CHECKS PASSED!")
         print(f"📊 Comprehensive HTML Report: {final_report_path}")
+        print(f"📝 Detailed Log File: {log_file}")
         sys.exit(0)
     else:
         print("✗ SOME TESTS OR INTEGRATION CHECKS FAILED!")
         print(f"📊 Comprehensive HTML Report: {final_report_path}")
+        print(f"📝 Detailed Log File: {log_file}")
+        
+        if failed_tests:
+            print(f"\n❌ Failed Tests ({len(failed_tests)}):")
+            for i, test_name in enumerate(failed_tests, 1):
+                print(f"   {i:2d}. {test_name}")
+        
         sys.exit(1)

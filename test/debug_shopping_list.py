@@ -6,8 +6,8 @@ Debug script for shopping_list_app.md loading issue.
 import sys
 import os
 
-# Add the current directory to Python path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add the parent directory to Python path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from libs.parse_req_md import ReadMDFile, ClassifyParts
 
@@ -16,7 +16,7 @@ def debug_shopping_list_app():
     print("🔍 Debugging shopping_list_app.md loading issue")
     print("=" * 60)
     
-    file_path = "test/real_requirements/shopping_list_app.md"
+    file_path = "real_requirements/shopping_list_app.md"
     
     # Step 1: Read the raw file
     print("\n1. Reading raw file content:")

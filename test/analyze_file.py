@@ -4,7 +4,7 @@ Detailed file analysis for shopping_list_app.md
 """
 
 def analyze_file():
-    file_path = "test/real_requirements/shopping_list_app.md"
+    file_path = "real_requirements/shopping_list_app.md"
     
     print("🔍 Detailed File Analysis")
     print("=" * 50)

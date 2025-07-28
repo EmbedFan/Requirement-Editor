@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 """Test script to verify terminal indentation fix."""
 
+import sys
+import os
+
+# Add the parent directory to Python path to import libs
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from libs.terminal_editor import TerminalEditor
 
 def test_indentation():
     """Test the terminal editor indentation display."""
     editor = TerminalEditor()
     
-    # Load a test file
-    test_file = "test/data/test_input.md"
+    # Load a test file (adjust path since we're now in test directory)
+    test_file = "data/test_input.md"
     editor._load_file(test_file)
     
     print("Testing terminal indentation display:")

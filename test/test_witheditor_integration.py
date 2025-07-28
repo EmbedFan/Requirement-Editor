@@ -9,14 +9,14 @@ are properly integrated and working.
 import sys
 import os
 
-# Add the current directory to Python path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add the parent directory to Python path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from libs.terminal_editor import TerminalEditor
 
 def test_witheditor_integration():
     """Test the complete witheditor integration."""
-    print("🧪 Witheditor Integration Test")
+    print("*** Witheditor Integration Test")
     print("=" * 50)
     
     success_count = 0

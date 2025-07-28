@@ -5,12 +5,12 @@ Simple indentation check for shopping_list_app.md
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from libs.parse_req_md import ReadMDFile, ClassifyParts
 
 def check_indentation():
-    file_path = "test/real_requirements/shopping_list_app.md"
+    file_path = "real_requirements/shopping_list_app.md"
     
     print("Indentation Analysis")
     print("===================")

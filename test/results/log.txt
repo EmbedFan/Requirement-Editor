@@ -1,0 +1,270 @@
+================================================================================
+REQUIREMENT EDITOR TEST RUNNER LOG
+================================================================================
+Timestamp: 2025-07-28 16:25:31
+Version: 1.1.0
+HTML Report: C:\Munka\Sandbox\PromptEnginering\Requirement Editor\python\test\results\test_result_20250728_162531.html
+
+TEST STATISTICS
+----------------------------------------
+Total Tests Run: 62
+Passed: 62
+Failed: 0
+Errors: 0
+Integration Test: PASSED
+Total Duration: 13.93 seconds
+Average Duration: 0.22 seconds per test
+
+DETAILED TEST RESULTS
+----------------------------------------
+Test: test_add_debug.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: test_browse_demo.py
+Status: PASSED
+Duration: 0.04s
+--------------------
+Test: test_cancellation_fix.py
+Status: PASSED
+Duration: 0.22s
+--------------------
+Test: test_cli.py
+Status: PASSED
+Duration: 0.66s
+--------------------
+Test: test_complete_solution.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_completion_comprehensive.py
+Status: PASSED
+Duration: 0.13s
+--------------------
+Test: test_comprehensive.py
+Status: PASSED
+Duration: 0.10s
+--------------------
+Test: test_comprehensive_config.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_config_location.py
+Status: PASSED
+Duration: 0.10s
+--------------------
+Test: test_corrected_file.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: test_dattr_styling.py
+Status: PASSED
+Duration: 0.08s
+--------------------
+Test: test_debug_hang.py
+Status: PASSED
+Duration: 0.10s
+--------------------
+Test: test_debug_legacy.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: test_display_mode.py
+Status: PASSED
+Duration: 0.09s
+--------------------
+Test: test_display_scenarios.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: test_encoding_fix.py
+Status: PASSED
+Duration: 0.06s
+--------------------
+Test: test_enhanced_tab_completion.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_exact_issue.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: test_exact_scenario.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: test_export_improvements.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: test_filename_loading.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: test_fixed_tests.py
+Status: PASSED
+Duration: 0.37s
+--------------------
+Test: test_id_fix.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_indent_fix.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: test_integer_ids.py
+Status: PASSED
+Duration: 0.10s
+--------------------
+Test: test_issue_verification.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: test_legacy_file_id_fix.py
+Status: PASSED
+Duration: 0.09s
+--------------------
+Test: test_legacy_no_terminal.py
+Status: PASSED
+Duration: 0.09s
+--------------------
+Test: test_line_numbers.py
+Status: PASSED
+Duration: 0.09s
+--------------------
+Test: test_main_editor_completion.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_main_filename.py
+Status: PASSED
+Duration: 0.10s
+--------------------
+Test: test_md_edit_integration.py
+Status: PASSED
+Duration: 0.05s
+--------------------
+Test: test_md_edit_line_based.py
+Status: PASSED
+Duration: 0.05s
+--------------------
+Test: test_md_edit_refactor.py
+Status: PASSED
+Duration: 0.05s
+--------------------
+Test: test_minimal_legacy.py
+Status: PASSED
+Duration: 0.05s
+--------------------
+Test: test_mod_date.py
+Status: PASSED
+Duration: 2.14s
+--------------------
+Test: test_mod_date_fixed.py
+Status: PASSED
+Duration: 2.13s
+--------------------
+Test: test_mod_date_simple.py
+Status: PASSED
+Duration: 2.13s
+--------------------
+Test: test_mode_completion_fix.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: test_orange_yellow_dattr.py
+Status: PASSED
+Duration: 0.09s
+--------------------
+Test: test_practical_demo.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_practical_id_fix.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_project_config.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: test_quick_runner.py
+Status: PASSED
+Duration: 0.37s
+--------------------
+Test: test_save_issue.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: test_saveas_final.py
+Status: PASSED
+Duration: 0.25s
+--------------------
+Test: test_saveas_integration.py
+Status: PASSED
+Duration: 0.24s
+--------------------
+Test: test_saveas_interactive.py
+Status: PASSED
+Duration: 0.15s
+--------------------
+Test: test_simple.py
+Status: PASSED
+Duration: 0.10s
+--------------------
+Test: test_simple_aliases.py
+Status: PASSED
+Duration: 0.10s
+--------------------
+Test: test_stylesheet_config.py
+Status: PASSED
+Duration: 0.13s
+--------------------
+Test: test_tab_completion.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_tab_functionality.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_terminal_config_location.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_type_aliases.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_type_command.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_ultra_minimal.py
+Status: PASSED
+Duration: 0.09s
+--------------------
+Test: test_updated_dattr_styling.py
+Status: PASSED
+Duration: 0.10s
+--------------------
+Test: test_witheditor.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_witheditor_integration.py
+Status: PASSED
+Duration: 0.12s
+--------------------
+Test: test_working_tab.py
+Status: PASSED
+Duration: 0.11s
+--------------------
+Test: Integration Test - Main Application
+Status: PASSED
+Duration: 0.08s
+--------------------
+
+LOG END
+================================================================================

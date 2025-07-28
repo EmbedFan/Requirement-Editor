@@ -5,7 +5,7 @@ Test to confirm the line number issue with empty lines.
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from libs.parse_req_md import ReadMDFile, ClassifyParts
 
@@ -13,7 +13,7 @@ def test_line_numbers():
     print("Testing line number assignment")
     print("=" * 40)
     
-    file_path = "test/real_requirements/shopping_list_app.md"
+    file_path = "real_requirements/shopping_list_app.md"
     
     # Read the file and show actual line numbers
     with open(file_path, 'r', encoding='utf-8') as f:
