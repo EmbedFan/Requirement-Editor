@@ -1,49 +1,6 @@
-Add indent command for indentation repair and clean up project structure
+This is the final release of the free demo version.
+No additional features will be added to this project.
 
-Latest Changes:
-• Added 'indent' command to terminal editor for checking and repairing document indentation
-• Implemented iterative indentation repair algorithm with cascading fix detection
-• Added comprehensive validation system for hierarchy consistency
-• Fixed terminal display indentation to match HTML export (first level = no indent)
-• Enhanced MarkdownEditor with repair_indentation() method
-• Added warning system for structural issues and excessive nesting
-• Updated help documentation with new indent command
+Development will continue under a new name and repository as a professional software product, available with a commercial license and a 3-year software warranty.
+If you’re interested, feel free to contact me at attila@tux-net.hu.
 
-Project Cleanup:
-• Moved test/debug scripts from root to test/ directory
-• Moved demo scripts from root to examples/ directory  
-• Removed temporary files (shopping_list_analysis_report.txt, cmd_test_export_config.json, etc.)
-• Removed duplicate test files from root directory
-• Cleaned up project root to contain only essential files
-
-Indentation System Features:
-• Smart repair based on parent-child relationships
-• Multiple iteration passes to handle cascading indentation issues
-• Validation of orphaned items and missing parents
-• Warning for excessive nesting levels (>10)
-• Terminal and HTML export indentation consistency
-
-Files Reorganized:
-• analyze_file.py → test/
-• check_indent.py → test/
-• debug_shopping_list.py → test/
-• test_indent_fix.py → test/
-• demo_browser_functionality.py → examples/
-• demo_editor_commands.py → examples/
-• test_browse_demo.py → test/
-• test_line_numbers.py → test/
-• test_browse_demo.md → test/
-
-Technical Implementation:
-• Enhanced _format_line() in TerminalEditor for proper indentation display
-• Added repair_indentation() method to MarkdownEditor class
-• Integrated indent command into terminal command processor
-• Added comprehensive error handling and user feedback
-
-Root directory now contains only:
-• main.py (entry point)
-• README.md, LICENSE, requirements.txt (documentation)
-• libs/, docs/, examples/, test/ (core directories)
-• Git configuration files
-
-All indentation features tested and documented.

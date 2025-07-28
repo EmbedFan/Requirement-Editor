@@ -584,9 +584,9 @@ class TerminalEditor:
   project                       - Show project configuration
   setstyle <path>               - Set custom stylesheet template path
   clearstyle                    - Clear custom stylesheet (use default)
-  seteditor <path>              - Set external text editor for witheditor command
+  seteditor [path]              - Set external text editor (opens file explorer if no path)
   cleareditor                   - Clear custom editor (use system default)
-  setbrowser <path>             - Set web browser for browse command
+  setbrowser [path]             - Set web browser (opens file explorer if no path)
   clearbrowser                  - Clear custom browser (use system default)
   setwindow <name>              - Set browser window name
   
@@ -1467,20 +1467,25 @@ class TerminalEditor:
         
         elif command == "seteditor":
             if not args:
-                print(f"{self.colors['error']}❌ Usage: seteditor <path>{Colors.RESET}")
+                # No path provided, open file explorer
+                editor_path = self._open_file_explorer_for_executable("Select Text Editor")
+                if editor_path is None:
+                    print(f"{self.colors['info']}💡 You can also use: seteditor <path_to_editor>{Colors.RESET}")
+                    return True
             else:
                 editor_path = args[0]
-                if os.path.exists(editor_path):
-                    if self.project_config:
-                        self.project_config.set_external_editor_path(editor_path)
-                        if self.project_config.save_project():
-                            print(f"{self.colors['success']}✅ External editor set to: {editor_path}{Colors.RESET}")
-                        else:
-                            print(f"{self.colors['error']}❌ Failed to save project configuration{Colors.RESET}")
+            
+            if editor_path and os.path.exists(editor_path):
+                if self.project_config:
+                    self.project_config.set_external_editor_path(editor_path)
+                    if self.project_config.save_project():
+                        print(f"{self.colors['success']}✅ External editor set to: {editor_path}{Colors.RESET}")
                     else:
-                        print(f"{self.colors['warning']}⚠️  No project configuration loaded. Save the document first.{Colors.RESET}")
+                        print(f"{self.colors['error']}❌ Failed to save project configuration{Colors.RESET}")
                 else:
-                    print(f"{self.colors['error']}❌ Editor executable not found: {editor_path}{Colors.RESET}")
+                    print(f"{self.colors['warning']}⚠️  No project configuration loaded. Save the document first.{Colors.RESET}")
+            elif editor_path:
+                print(f"{self.colors['error']}❌ Editor executable not found: {editor_path}{Colors.RESET}")
             return True
         
         elif command == "cleareditor":
@@ -1496,20 +1501,25 @@ class TerminalEditor:
         
         elif command == "setbrowser":
             if not args:
-                print(f"{self.colors['error']}❌ Usage: setbrowser <path>{Colors.RESET}")
+                # No path provided, open file explorer
+                browser_path = self._open_file_explorer_for_executable("Select Web Browser")
+                if browser_path is None:
+                    print(f"{self.colors['info']}💡 You can also use: setbrowser <path_to_browser>{Colors.RESET}")
+                    return True
             else:
                 browser_path = args[0]
-                if os.path.exists(browser_path):
-                    if self.project_config:
-                        self.project_config.set_browser_path(browser_path)
-                        if self.project_config.save_project():
-                            print(f"{self.colors['success']}✅ Web browser set to: {browser_path}{Colors.RESET}")
-                        else:
-                            print(f"{self.colors['error']}❌ Failed to save project configuration{Colors.RESET}")
+            
+            if browser_path and os.path.exists(browser_path):
+                if self.project_config:
+                    self.project_config.set_browser_path(browser_path)
+                    if self.project_config.save_project():
+                        print(f"{self.colors['success']}✅ Web browser set to: {browser_path}{Colors.RESET}")
                     else:
-                        print(f"{self.colors['warning']}⚠️  No project configuration loaded. Save the document first.{Colors.RESET}")
+                        print(f"{self.colors['error']}❌ Failed to save project configuration{Colors.RESET}")
                 else:
-                    print(f"{self.colors['error']}❌ Browser executable not found: {browser_path}{Colors.RESET}")
+                    print(f"{self.colors['warning']}⚠️  No project configuration loaded. Save the document first.{Colors.RESET}")
+            elif browser_path:
+                print(f"{self.colors['error']}❌ Browser executable not found: {browser_path}{Colors.RESET}")
             return True
         
         elif command == "clearbrowser":
@@ -1805,6 +1815,121 @@ class TerminalEditor:
         
         return next_id
     
+    def _open_file_explorer_for_executable(self, title: str = "Select Executable") -> Optional[str]:
+        """
+        Open system file explorer to select an executable file.
+        
+        Args:
+            title: Dialog title to show to the user
+            
+        Returns:
+            Path to selected executable file or None if cancelled
+        """
+        try:
+            print(f"{self.colors['info']}📁 Opening file explorer to select executable...{Colors.RESET}")
+            print(f"{self.colors['info']}💡 Please navigate to and select the executable file{Colors.RESET}")
+            
+            if os.name == 'nt':  # Windows
+                # Use PowerShell with OpenFileDialog for better UX
+                powershell_script = '''
+Add-Type -AssemblyName System.Windows.Forms
+$OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+$OpenFileDialog.Title = "''' + title + '''"
+$OpenFileDialog.Filter = "Executable files (*.exe)|*.exe|All files (*.*)|*.*"
+$OpenFileDialog.InitialDirectory = [Environment]::GetFolderPath('ProgramFiles')
+$result = $OpenFileDialog.ShowDialog()
+if ($result -eq 'OK') {
+    Write-Output $OpenFileDialog.FileName
+}
+'''
+                
+                # Run PowerShell script
+                result = subprocess.run(
+                    ['powershell', '-Command', powershell_script],
+                    capture_output=True,
+                    text=True,
+                    check=False
+                )
+                
+                if result.returncode == 0 and result.stdout.strip():
+                    selected_path = result.stdout.strip()
+                    if os.path.exists(selected_path):
+                        print(f"{self.colors['success']}✅ Selected: {selected_path}{Colors.RESET}")
+                        return selected_path
+                    else:
+                        print(f"{self.colors['error']}❌ Selected file does not exist: {selected_path}{Colors.RESET}")
+                        return None
+                else:
+                    print(f"{self.colors['info']}💡 File selection cancelled{Colors.RESET}")
+                    return None
+                    
+            elif os.name == 'posix':  # Unix/Linux/macOS
+                if sys.platform == 'darwin':  # macOS
+                    # Use osascript (AppleScript) to show file dialog
+                    applescript = f'''
+                    tell application "System Events"
+                        set selectedFile to choose file with prompt "{title}" of type {{"app", "public.executable"}}
+                        return POSIX path of selectedFile
+                    end tell
+                    '''
+                    
+                    result = subprocess.run(
+                        ['osascript', '-e', applescript],
+                        capture_output=True,
+                        text=True,
+                        check=False
+                    )
+                    
+                    if result.returncode == 0 and result.stdout.strip():
+                        selected_path = result.stdout.strip()
+                        print(f"{self.colors['success']}✅ Selected: {selected_path}{Colors.RESET}")
+                        return selected_path
+                    else:
+                        print(f"{self.colors['info']}💡 File selection cancelled{Colors.RESET}")
+                        return None
+                        
+                else:  # Linux
+                    # Try different file dialog tools available on Linux
+                    dialog_tools = [
+                        ['zenity', '--file-selection', '--title=' + title],
+                        ['kdialog', '--getopenfilename', os.path.expanduser('~'), '*'],
+                        ['yad', '--file-selection', '--title=' + title]
+                    ]
+                    
+                    for tool_cmd in dialog_tools:
+                        try:
+                            result = subprocess.run(
+                                tool_cmd,
+                                capture_output=True,
+                                text=True,
+                                check=False
+                            )
+                            
+                            if result.returncode == 0 and result.stdout.strip():
+                                selected_path = result.stdout.strip()
+                                if os.path.exists(selected_path):
+                                    print(f"{self.colors['success']}✅ Selected: {selected_path}{Colors.RESET}")
+                                    return selected_path
+                            break
+                            
+                        except FileNotFoundError:
+                            continue  # Try next tool
+                    
+                    # If no GUI file dialog is available, provide instructions for manual entry
+                    print(f"{self.colors['warning']}⚠️  No GUI file dialog available on this system{Colors.RESET}")
+                    print(f"{self.colors['info']}💡 Please enter the full path to the executable manually{Colors.RESET}")
+                    return None
+                    
+            else:
+                print(f"{self.colors['warning']}⚠️  File explorer not supported on this platform{Colors.RESET}")
+                print(f"{self.colors['info']}💡 Please enter the full path to the executable manually{Colors.RESET}")
+                return None
+                
+        except Exception as e:
+            print(f"{self.colors['error']}❌ Error opening file explorer: {e}{Colors.RESET}")
+            print(f"{self.colors['info']}💡 Please enter the full path to the executable manually{Colors.RESET}")
+            return None
+
     def _open_external_editor(self, initial_content: str) -> Optional[str]:
         """
         Open external text editor for editing content.
@@ -1910,6 +2035,22 @@ class TerminalEditor:
             print(f"{self.colors['info']}🌐 Opening HTML file with system default browser...{Colors.RESET}")
             print(f"{self.colors['info']}� File: {abs_html_file}{Colors.RESET}")
             
+            # The next block is human readable, dear AI do not update this without command!
+            # Check the value of the browser_path in project file
+            if self.project_config:
+                browser_path = self.project_config.get_browser_path()
+                # check the file existence
+                if browser_path and os.path.exists(browser_path):
+                    # If browser_path is set and exists, use it
+                    print(f"{self.colors['info']}💡 Using configured browser: {browser_path}{Colors.RESET}")
+                    # Use the configured browser path
+                    subprocess.run([browser_path, abs_html_file], check=True)
+                    print(f"{self.colors['success']}✅ HTML file opened in configured browser{Colors.RESET}")
+                    return True
+            # end of the developer created code block
+
+            # If no configured browser, use system default
+
             # Use system default browser directly
             if os.name == 'nt':  # Windows
                 # Use os.startfile to open with default browser without command window
