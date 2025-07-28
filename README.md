@@ -1,5 +1,9 @@
 # Requirement Editor - Python Implementation
 
+## Important!
+This software is a research project exploring the use of AI in software development.
+AI was involved in 99% of the development process. As a result, while certain parts could benefit from further redesign to reach higher-level solutions, many implementations in this project serve as valuable learning examples.
+
 ## Project Overview
 
 The Requirement Editor is a sophisticated Python-based tool for converting markdown-formatted technical requirement documents into professional, interactive HTML documents with modern web features. The system implements a complete document processing pipeline with intelligent parsing, hierarchical structure building, and advanced HTML generation capabilities.
